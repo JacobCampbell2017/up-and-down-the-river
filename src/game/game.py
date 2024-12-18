@@ -1,7 +1,7 @@
 """
 12/18/2024
 
-Contains game class
+Contains game logic and related classes
 """
 
 from enum import Enum
@@ -61,9 +61,3 @@ class Card:
             return "Joker"
         else:
             return f"{self.name.name} of {self.suit.name}"
-
-
-deck = [Card(Name.JOKER, Suit.JOKER), Card(Name.ACE, Suit.DIAMONDS)]
-
-for card in deck:
-    print(card)
