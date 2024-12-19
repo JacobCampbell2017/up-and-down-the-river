@@ -39,16 +39,29 @@ class Name(Enum):
 
 class Game:
     def __init__(self):
-        self.players = list()
-        self.winner = None
-        self.round = 0
-        # add deck which is a list of card objects
+        # List of Players (Turn Order)
+        # Deck
+        # Winner
+        pass
+
+
+class Player:
+    # Hand
+    # Score
+    pass
+
+
+class Hand:
+    # of cards
+    # list of cards
+    pass
 
 
 class Card:
     def __init__(self, name: Name, suit: Suit):
         self.name = name
         self.suit = suit
+        self.value = self._assignValue()
 
     def _assignValue(self):
         if self.name.value >= 3 and self.name.value <= 9:
