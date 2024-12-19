@@ -38,8 +38,8 @@ class Name(Enum):
 
 
 class Game:
-    def __init__(self):
-        # List of Players (Turn Order)
+    def __init__(self, num_players: int):
+        self.players = self._generatePlayers(num_players)
         self.deck = self._generateDeck()
         self.winner = False
         pass
@@ -47,6 +47,14 @@ class Game:
     def game_loop(self):
         while self.winner == False:
             pass
+
+    def displayDeck(self):
+        for card in self.deck:
+            print(card)
+
+    def displayPlayers(self):
+        for player in self.players:
+            print(player)
 
     def _generateDeck(self) -> list:
         deck = []
@@ -56,15 +64,23 @@ class Game:
         deck.extend([Card(Name.JOKER, Suit.JOKER) for _ in range(4)])
         return deck * 2
 
-    def displayDeck(self):
-        for card in self.deck:
-            print(card)
+    def _generatePlayers(self, num: int) -> list:
+        players = []
+        for _ in range(num):
+            players.append(Player())
+        return players
+
+    def __repr__(self):
+        return str(f"{self.players} {self.deck} {self.winner}")
 
 
 class Player:
-    # Hand
-    # Score
-    pass
+    def __init__(self):
+        self.name = input("Enter Player name: ")
+        self.score = 0
+
+    def __str__(self):
+        return str(f"{self.name} {self.score}")
 
 
 class Hand:
@@ -94,10 +110,14 @@ class Card:
         if self.name.name == "JOKER":
             return "Value: Joker"
         else:
-            return f"Value: {self.name.name}, Suit: {self.suit.name}"
+            return f"Value: {self.name.name} Suit: {self.suit.name}"
 
     def __str__(self):
         if self.name.name == "JOKER":
             return "JOKER"
         else:
             return f"{self.name.name} of {self.suit.name}"
+
+
+z = Game(1)
+z.displayPlayers()
