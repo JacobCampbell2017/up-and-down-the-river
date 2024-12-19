@@ -40,13 +40,25 @@ class Name(Enum):
 class Game:
     def __init__(self):
         # List of Players (Turn Order)
-        # Deck
+        self.deck = self._generateDeck()
         self.winner = False
         pass
 
     def game_loop(self):
         while self.winner == False:
             pass
+
+    def _generateDeck(self) -> list:
+        deck = []
+        for suit in list(Suit)[:4]:
+            for name in list(Name)[1:]:
+                deck.append(Card(name, suit))
+        deck.extend([Card(Name.JOKER, Suit.JOKER) for _ in range(4)])
+        return deck * 2
+
+    def displayDeck(self):
+        for card in self.deck:
+            print(card)
 
 
 class Player:
@@ -70,13 +82,13 @@ class Card:
     def _assignValue(self):
         """Assigns point value to card based on the values given to constructor."""
         if self.name.value >= 3 and self.name.value <= 9:
-            self.value = 5
+            return 5
         elif self.name.value >= 10 and self.name.value <= 13:
-            self.value = 10
+            return 10
         elif self.name.value == 14:
-            self.value = 15
+            return 15
         else:
-            self.value = 20
+            return 20
 
     def __repr__(self):
         if self.name.name == "JOKER":
