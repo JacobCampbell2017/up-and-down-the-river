@@ -41,8 +41,12 @@ class Game:
     def __init__(self):
         # List of Players (Turn Order)
         # Deck
-        # Winner
+        self.winner = False
         pass
+
+    def game_loop(self):
+        while self.winner == False:
+            pass
 
 
 class Player:
@@ -64,6 +68,7 @@ class Card:
         self.value = self._assignValue()
 
     def _assignValue(self):
+        """Assigns point value to card based on the values given to constructor."""
         if self.name.value >= 3 and self.name.value <= 9:
             self.value = 5
         elif self.name.value >= 10 and self.name.value <= 13:
@@ -73,8 +78,14 @@ class Card:
         else:
             self.value = 20
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         if self.name.name == "JOKER":
-            return "Joker"
+            return "Value: Joker"
+        else:
+            return f"Value: {self.name.name}, Suit: {self.suit.name}"
+
+    def __str__(self):
+        if self.name.name == "JOKER":
+            return "JOKER"
         else:
             return f"{self.name.name} of {self.suit.name}"
