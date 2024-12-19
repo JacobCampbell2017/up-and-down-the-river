@@ -2,6 +2,11 @@
 12/18/2024
 
 Contains game logic and related classes
+
+Future Considerations for game rules:
+ - Minimum/Maximum players changing the cards dealt and deck count
+
+
 """
 
 from enum import Enum
@@ -44,7 +49,6 @@ class Card:
     def __init__(self, name: Name, suit: Suit):
         self.name = name
         self.suit = suit
-        self.value = 0
 
     def _assignValue(self):
         if self.name.value >= 3 and self.name.value <= 9:
