@@ -11,6 +11,8 @@ Future Considerations for game rules:
 
 from enum import Enum
 
+import random
+
 
 class Suit(Enum):
     HEARTS = 0
@@ -35,58 +37,6 @@ class Name(Enum):
     QUEEN = 12
     KING = 13
     ACE = 14
-
-
-class Game:
-    def __init__(self, num_players: int):
-        self.players = self._generatePlayers(num_players)
-        self.deck = self._generateDeck()
-        self.winner = False
-        pass
-
-    def game_loop(self):
-        while self.winner == False:
-            pass
-
-    def displayDeck(self):
-        for card in self.deck:
-            print(card)
-
-    def displayPlayers(self):
-        for player in self.players:
-            print(player)
-
-    def _generateDeck(self) -> list:
-        deck = []
-        for suit in list(Suit)[:4]:
-            for name in list(Name)[1:]:
-                deck.append(Card(name, suit))
-        deck.extend([Card(Name.JOKER, Suit.JOKER) for _ in range(4)])
-        return deck * 2
-
-    def _generatePlayers(self, num: int) -> list:
-        players = []
-        for _ in range(num):
-            players.append(Player())
-        return players
-
-    def __repr__(self):
-        return str(f"{self.players} {self.deck} {self.winner}")
-
-
-class Player:
-    def __init__(self):
-        self.name = input("Enter Player name: ")
-        self.score = 0
-
-    def __str__(self):
-        return str(f"{self.name} {self.score}")
-
-
-class Hand:
-    # of cards
-    # list of cards
-    pass
 
 
 class Card:
@@ -119,5 +69,63 @@ class Card:
             return f"{self.name.name} of {self.suit.name}"
 
 
-z = Game(1)
+class Game:
+    def __init__(self):
+        self.players = [Player("A"), Player("B"), Player("C")]
+        self.deck = self._generateDeck()
+        self.winner = False
+        pass
+
+    def game_loop(self):
+        while self.winner == False:
+            pass
+
+    def displayDeck(self):
+        for card in self.deck:
+            print(card)
+
+    def displayPlayers(self):
+        for player in self.players:
+            print(player)
+
+    def drawCard(self) -> Card:
+        return self.deck.pop()
+
+    def shuffleDeck(self) -> list:
+        return random.shuffle(self.deck)
+
+    def _generateDeck(self) -> list:
+        deck = []
+        for suit in list(Suit)[:4]:
+            for name in list(Name)[1:]:
+                deck.append(Card(name, suit))
+        deck.extend([Card(Name.JOKER, Suit.JOKER) for _ in range(4)])
+        return deck * 2
+
+    def _generatePlayers(self, num: int) -> list:
+        players = []
+        for _ in range(num):
+            players.append(Player())
+        return players
+
+    def __repr__(self):
+        return str(f"{self.players} {self.deck} {self.winner}")
+
+
+class Player:
+    def __init__(self, name: str):
+        self.name = name
+        self.score = 0
+
+    def __str__(self):
+        return str(f"{self.name} {self.score}")
+
+
+class Hand:
+    # of cards
+    # list of cards
+    pass
+
+
+z = Game()
 z.displayPlayers()
