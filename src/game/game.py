@@ -12,6 +12,7 @@ Future Considerations for game rules:
 """
 
 from enum import Enum
+from game_errors import EmptyDecksError
 
 import random
 
@@ -70,14 +71,21 @@ class Card:
         else:
             return f"{self.name.name} of {self.suit.name}"
 
+    def __lt__(self, other):
+        """Defines how cards are compared for sorting"""
+        if not isinstance(other, Card):
+            return NotImplemented
+        return self.value < other.value
+
 
 class Game:
     def __init__(self):
         self.players = [Player("A"), Player("B"), Player("C")]
         self.deck = self._generateDeck()
-        self.discard = None
+        self.discard = []
         self.winner = False
         self.currentPlayer = self.players[0]
+        self.round = 0
         pass
 
     # Game Essentials
@@ -88,45 +96,84 @@ class Game:
             pass
 
     def drawCard(self) -> Card:
-        """Returns a card from last Card in self.deck"""
+        """Draws a card from the deck or refills it if empty."""
+        if len(self.deck) == 0:
+            if len(self.discard) == 0:
+                raise EmptyDecksError(
+                    "Both the deck and discard pile are empty somehow."
+                )
+
+            self.deck = self.discard
+            self.shuffleDeck()
         return self.deck.pop()
 
     def shuffleDeck(self) -> list:
-        """Shuffles self.deck. Can be Called without storing in a variable.
+        """Shuffles self.deck and updates in place.
+
+        It modifies the deck directly and can be called without storing the result.
 
         Returns:
             list: the shuffled deck
         """
         return random.shuffle(self.deck)
 
-    def dealCards(self):
+    def dealCards(self) -> None:
         """Adds 11 Cards to every players hand. The deck continues to be shuffled until the top card that is
         added to the discard pile is not a wild card.
         """
         for _ in range(11):
             for player in self.players:
                 player.addCard(self.drawCard())
-        x = self.deck[-1]
-        while x.value == 20:
+        self.discard = self.deck[-1:]
+        while self.discard[0].value == 20:
             self.shuffleDeck()
-            x = self.deck[-1]
-        self.discard = x
+            self.discard = self.deck[-1:]
+        return None
+
+    def isValidSet(self, played_hand: list) -> bool:
+        """Determines if the selected cards are a valid set.
+
+        Args:
+            played_hand (list): Selected cards to play as a set.
+
+        Returns:
+            bool: True if valid set or False if invalid set.
+        """
+        if len(played_hand) != 3:
+            return False
+        # Sort played hands based on the value
+        played_hand.sort()
+
+        if played_hand[0].value == 20:
+            return False
+
+        if (
+            played_hand[0].name != played_hand[1].name and played_hand[1].value != 20
+        ) or (
+            played_hand[0].name != played_hand[2].name and played_hand[2].value != 20
+        ):
+            return False
+
+        return True
 
     # Display Functions #
 
-    def displayDeck(self):
+    def displayDeck(self) -> None:
         """displays cards left in the deck"""
         for card in self.deck:
             print(str(card))
+        return None
 
-    def displayPlayers(self):
+    def displayPlayers(self) -> None:
         """Displays players"""
         for player in self.players:
             print(player)
+        return None
 
-    def displayDiscard(self):
+    def displayDiscard(self) -> None:
         """Displays the current card in the discard pile"""
         print(str(self.discard))
+        return None
 
     # Game Setup #
 
@@ -147,7 +194,7 @@ class Game:
     # Magic Methods #
 
     def __repr__(self):
-        return str(f"{self.players} {self.deck} {self.winner}")
+        return f"{self.players} {self.deck} {self.winner}"
 
 
 class Player:
@@ -160,9 +207,11 @@ class Player:
         return self.hand.append(card)
 
     def __str__(self):
-        return str(f"{self.name} {self.score} {self.hand}")
+        hand_str = ", ".join(str(card) for card in self.hand)
+        return f"Player {self.name} | Score: {self.score} | Hand: [{hand_str}]"
 
 
 z = Game()
 z.shuffleDeck()
 z.dealCards()
+z.displayDiscard()
