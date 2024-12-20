@@ -1,5 +1,7 @@
 """
-12/18/2024
+12/18/2024 - The Beginning
+
+Goal: Get a text version of the game to be able to played by one terminal
 
 Contains game logic and related classes
 
@@ -58,9 +60,9 @@ class Card:
 
     def __repr__(self):
         if self.name.name == "JOKER":
-            return "Value: Joker"
+            return "JOKER"
         else:
-            return f"Value: {self.name.name} Suit: {self.suit.name}"
+            return f"{self.name.name} of {self.suit.name}"
 
     def __str__(self):
         if self.name.name == "JOKER":
@@ -73,26 +75,60 @@ class Game:
     def __init__(self):
         self.players = [Player("A"), Player("B"), Player("C")]
         self.deck = self._generateDeck()
+        self.discard = None
         self.winner = False
+        self.currentPlayer = self.players[0]
         pass
 
+    # Game Essentials
+
     def game_loop(self):
+        """Main loop that will run the game until final round is played"""
         while self.winner == False:
             pass
 
-    def displayDeck(self):
-        for card in self.deck:
-            print(card)
-
-    def displayPlayers(self):
-        for player in self.players:
-            print(player)
-
     def drawCard(self) -> Card:
+        """Returns a card from last Card in self.deck"""
         return self.deck.pop()
 
     def shuffleDeck(self) -> list:
+        """Shuffles self.deck. Can be Called without storing in a variable.
+
+        Returns:
+            list: the shuffled deck
+        """
         return random.shuffle(self.deck)
+
+    def dealCards(self):
+        """Adds 11 Cards to every players hand. The deck continues to be shuffled until the top card that is
+        added to the discard pile is not a wild card.
+        """
+        for _ in range(11):
+            for player in self.players:
+                player.addCard(self.drawCard())
+        x = self.deck[-1]
+        while x.value == 20:
+            self.shuffleDeck()
+            x = self.deck[-1]
+        self.discard = x
+
+    # Display Functions #
+
+    def displayDeck(self):
+        """displays cards left in the deck"""
+        for card in self.deck:
+            print(str(card))
+
+    def displayPlayers(self):
+        """Displays players"""
+        for player in self.players:
+            print(player)
+
+    def displayDiscard(self):
+        """Displays the current card in the discard pile"""
+        print(str(self.discard))
+
+    # Game Setup #
 
     def _generateDeck(self) -> list:
         deck = []
@@ -108,6 +144,8 @@ class Game:
             players.append(Player())
         return players
 
+    # Magic Methods #
+
     def __repr__(self):
         return str(f"{self.players} {self.deck} {self.winner}")
 
@@ -116,16 +154,15 @@ class Player:
     def __init__(self, name: str):
         self.name = name
         self.score = 0
+        self.hand = []
+
+    def addCard(self, card: Card) -> list:
+        return self.hand.append(card)
 
     def __str__(self):
-        return str(f"{self.name} {self.score}")
-
-
-class Hand:
-    # of cards
-    # list of cards
-    pass
+        return str(f"{self.name} {self.score} {self.hand}")
 
 
 z = Game()
-z.displayPlayers()
+z.shuffleDeck()
+z.dealCards()
