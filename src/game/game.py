@@ -82,7 +82,13 @@ class Card:
         """Defines how cards are compared for sorting"""
         if not isinstance(other, Card):
             return NotImplemented
-        return self.value < other.value
+        return self.name.value < other.name.value
+
+    def __gt__(self, other):
+        """Defines how cards are compared for sorting"""
+        if not isinstance(other, Card):
+            return NotImplemented
+        return self.name.value >= other.name.value
 
 
 class Game:
@@ -182,22 +188,39 @@ class Game:
         played_hand.sort()
 
         # if all cards are wild cards
-        if played_hand[0].value == 20:
+        # if multiple suits are played in same hand
+        # Take suit of first non wild
+        suit = Suit.WILD
+        for card in played_hand:
+            if card.suit != Suit.WILD and card.value != 20:
+                suit = card.suit
+        if suit == Suit.WILD:
             return False
 
-        # if multiple suits are played in same hand
         base_card = played_hand[0]
+
         for card in played_hand[1:3]:
-            if card.suit != base_card.suit and card.value != 20:
+            if card.suit != suit and card.value != 20:
                 return False
 
         # if same suits but cards not in sequence
         for card in played_hand[1:3]:
-            if type(card) == Wild and (
-                played_hand[card.chosen_name.value - base_card.name.value != card]
+            if (type(base_card) == Wild and type(card) == Wild) and (
+                played_hand[card.chosen_name.value - base_card.chosen_name.value]
+                != card
             ):
                 return False
-            if played_hand[card.name.value - base_card.name.value] != card:
+            if (type(base_card) == Wild and type(card) != Wild) and (
+                played_hand[card.name.value - base_card.chosen_name.value] != card
+            ):
+                return False
+            if (type(base_card) != Wild and type(card) == Wild) and (
+                played_hand[card.chosen_name.value - base_card.name.value] != card
+            ):
+                return False
+            if (type(base_card) != Wild and type(card) != Wild) and (
+                played_hand[card.name.value - base_card.name.value] != card
+            ):
                 return False
 
         return True
@@ -228,7 +251,7 @@ class Game:
         for suit in list(Suit)[:4]:
             for name in list(Name)[2:]:
                 if name == Name.TWO:
-                    deck.append(Wild(name, Suit.WILD))
+                    deck.append(Wild(name, suit))
                 else:
                     deck.append(Card(name, suit))
         deck.extend([Wild(Name.JOKER, Suit.WILD) for _ in range(2)])
@@ -265,6 +288,7 @@ class Wild(Card):
     def __init__(self, name, suit):
         super().__init__(name, suit)
         self.chosen_name = Name.INVALID
+        self.chosen_suit = Suit.WILD
 
     def change_value(self, chosen: str) -> Name:
         """Changes temporary name to card of users choice.
@@ -278,14 +302,60 @@ class Wild(Card):
         for name in Name:
             if chosen == name.name:
                 self.chosen_name = Name(name)
+                return self.chosen_name
+        raise InvalidChangeError
 
-        return self.chosen_name
+    def change_suit(self, chosen: str) -> Suit:
+        """Changes temporary suit to suit of users choice.
+
+        Args:
+            chosen (str): Name of card user wants to use wild in place of.
+        """
+        if chosen == "WILD":
+            raise InvalidChangeError
+
+        for suit in Suit:
+            if chosen == suit.name:
+                self.chosen_suit = Suit(suit)
+
+        return self.chosen_suit
 
     def __repr__(self):
-        return super().__repr__() + self.chosen_name
+        return (
+            super().__repr__()
+            + " - Temp value ->  "
+            + self.chosen_name.name
+            + " of "
+            + self.chosen_suit.name
+        )
 
     def __str__(self):
-        return super().__str__() + " - Temp value ->  " + self.chosen_name.name
+        return (
+            super().__str__()
+            + " - Temp value ->  "
+            + self.chosen_name.name
+            + " of "
+            + self.chosen_suit.name
+        )
+
+    def __lt__(self, other):
+        """Defines the way wildcards are compared to others"""
+        if not isinstance(other, Card):
+            return NotImplemented
+        return self.chosen_name.value < other.name.value
+
+    def __gt__(self, other):
+        """Defines the way wildcards are compared to others"""
+        if not isinstance(other, Card):
+            return NotImplemented
+        return self.chosen_name.value > other.name.value
 
 
 z = Game()
+
+wilds = [Wild(Name.TWO, Suit.WILD), Card(Name.FIVE, Suit.HEARTS)]
+print(wilds)
+
+wilds[0].change_suit("HEARTS")
+
+print(wilds)
