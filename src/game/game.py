@@ -28,7 +28,7 @@ class Suit(Enum):
     DIAMONDS = 1
     SPADES = 2
     CLUBS = 3
-    JOKER = 4
+    WILD = 4
 
 
 class Name(Enum):
@@ -193,8 +193,14 @@ class Game:
 
         # if same suits but cards not in sequence
         for card in played_hand[1:3]:
-            if (played_hand[card.name - base_card.name] != card) and card.value != 20:
+            if type(card) == Wild and (
+                played_hand[card.chosen_name.value - base_card.name.value != card]
+            ):
                 return False
+            if played_hand[card.name.value - base_card.name.value] != card:
+                return False
+
+        return True
 
     # Display Functions #
 
@@ -220,9 +226,13 @@ class Game:
     def _generateDeck(self) -> list:
         deck = []
         for suit in list(Suit)[:4]:
-            for name in list(Name)[1:]:
-                deck.append(Card(name, suit))
-        deck.extend([Card(Name.JOKER, Suit.JOKER) for _ in range(4)])
+            for name in list(Name)[2:]:
+                if name == Name.TWO:
+                    deck.append(Wild(name, Suit.WILD))
+                else:
+                    deck.append(Card(name, suit))
+        deck.extend([Wild(Name.JOKER, Suit.WILD) for _ in range(2)])
+
         return deck * 2
 
     def _generatePlayers(self, num: int) -> list:
@@ -279,6 +289,3 @@ class Wild(Card):
 
 
 z = Game()
-wild = Wild(Name.JOKER, Suit.JOKER)
-wild.change_value("THREE")
-print(wild)
