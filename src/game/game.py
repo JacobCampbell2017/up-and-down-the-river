@@ -7,7 +7,7 @@ Contains game logic and related classes
 
 
 12/20/2024
- - Left off on correctly adding isValidSet(played_hand) to validate if played hand is a set
+ - Left off on correctly adding is_valid_set(played_hand) to validate if played hand is a set
     - Sorts cards in played hand to ensure at least one card is not a wildcard 
  - Need to move to Validate a run then decided how to test playing cards in a hand
 
@@ -53,9 +53,9 @@ class Card:
     def __init__(self, name: Name, suit: Suit):
         self.name = name
         self.suit = suit
-        self.value = self._assignValue()
+        self.value = self._assign_value()
 
-    def _assignValue(self):
+    def _assign_value(self):
         """Assigns point value to card based on the values given to constructor."""
         if self.name.value >= 3 and self.name.value <= 9:
             return 5
@@ -97,7 +97,7 @@ class Player:
         self.score = 0
         self.hand = []
 
-    def addCard(self, card: Card) -> list:
+    def add_card(self, card: Card) -> list:
         return self.hand.append(card)
 
     def __repr__(self):
@@ -130,7 +130,7 @@ class Player:
 class Game:
     def __init__(self):
         self.players = [Player("A"), Player("B"), Player("C")]
-        self.deck = self._generateDeck()
+        self.deck = self._generate_deck()
         self.discard = []
         self.winner = False
         self.currentPlayer = self.players[0]
@@ -144,7 +144,7 @@ class Game:
         while self.winner == False:
             pass
 
-    def drawCard(self) -> Card:
+    def draw_card(self) -> Card:
         """Draws a card from the deck or refills it if empty."""
         if len(self.deck) == 0:
             if len(self.discard) == 0:
@@ -153,10 +153,10 @@ class Game:
                 )
 
             self.deck = self.discard
-            self.shuffleDeck()
+            self.shuffle_deck()
         return self.deck.pop()
 
-    def shuffleDeck(self) -> list:
+    def shuffle_deck(self) -> list:
         """Shuffles self.deck and updates in place.
 
         It modifies the deck directly and can be called without storing the result.
@@ -166,20 +166,20 @@ class Game:
         """
         return random.shuffle(self.deck)
 
-    def dealCards(self) -> None:
-        """Adds 11 Cards to every players hand. The deck continues to be shuffled until the top card that is
+    def deal_cards(self, num_of_cards=11) -> None:
+        """Adds a specified Cards to every players hand. The deck continues to be shuffled until the top card that is
         added to the discard pile is not a wild card.
         """
         for _ in range(11):
             for player in self.players:
-                player.addCard(self.drawCard())
+                player.add_card(self.draw_card())
         self.discard = self.deck[-1:]
         while self.discard[0].value == 20:
-            self.shuffleDeck()
+            self.shuffle_deck()
             self.discard = self.deck[-1:]
         return None
 
-    def determineWinner(self) -> list:
+    def determine_winner(self) -> list:
         winner = [self.players[0]]
         for player in self.players[1:]:
             if player == winner[0] and player is not winner[0]:
@@ -188,7 +188,7 @@ class Game:
                 winner = [player]
         return winner
 
-    def isValidSet(self, played_hand: list) -> bool:
+    def is_valid_set(self, played_hand: list) -> bool:
         """Determines if the selected cards are a valid set.
 
         Args:
@@ -215,7 +215,7 @@ class Game:
 
         return True
 
-    def isValidRun(self, played_hand: list) -> bool:
+    def is_valid_run(self, played_hand: list) -> bool:
         """Determines if the selected cards are a valid run.
 
         Args:
@@ -274,26 +274,26 @@ class Game:
 
     # Display Functions #
 
-    def displayDeck(self) -> None:
+    def display_deck(self) -> None:
         """displays cards left in the deck"""
         for card in self.deck:
             print(str(card))
         return None
 
-    def displayPlayers(self) -> None:
+    def display_players(self) -> None:
         """Displays players"""
         for player in self.players:
             print(player)
         return None
 
-    def displayDiscard(self) -> None:
+    def display_discard(self) -> None:
         """Displays the current card in the discard pile"""
         print(str(self.discard))
         return None
 
     # Game Setup #
 
-    def _generateDeck(self) -> list:
+    def _generate_deck(self) -> list:
         deck = []
         for suit in list(Suit)[:4]:
             for name in list(Name)[2:]:
@@ -305,7 +305,7 @@ class Game:
 
         return deck * 2
 
-    def _generatePlayers(self, num: int) -> list:
+    def _generate_players(self, num: int) -> list:
         players = []
         for _ in range(num):
             players.append(Player())
@@ -323,7 +323,7 @@ class Wild(Card):
         self.chosen_name = Name.INVALID
         self.chosen_suit = Suit.WILD
 
-    def change_value(self, chosen: str) -> Name:
+    def set_value(self, chosen: str) -> Name:
         """Changes temporary name to card of users choice.
 
         Args:
@@ -338,7 +338,7 @@ class Wild(Card):
                 return self.chosen_name
         raise InvalidChangeError
 
-    def change_suit(self, chosen: str) -> Suit:
+    def set_suit(self, chosen: str) -> Suit:
         """Changes temporary suit to suit of users choice.
 
         Args:
@@ -375,13 +375,26 @@ class Wild(Card):
         """Defines the way wildcards are compared to others"""
         if not isinstance(other, Card):
             return NotImplemented
+        if isinstance(other, Card) and self.chosen_name == Name.INVALID:
+            return self.value < other.name.value
         return self.chosen_name.value < other.name.value
 
     def __gt__(self, other):
         """Defines the way wildcards are compared to others"""
         if not isinstance(other, Card):
             return NotImplemented
+        if isinstance(other, Card) and self.chosen_name == Name.INVALID:
+            return self.value > other.name.value
         return self.chosen_name.value > other.name.value
 
 
-z = Game()
+play1 = [
+    Card(Name.ACE, Suit.DIAMONDS),
+    Wild(Name.TWO, Suit.DIAMONDS),
+    Card(Name.ACE, Suit.CLUBS),
+]
+print(play1)
+play1.sort()
+print(play1)
+
+print(type(play1[0]) == Wild)

@@ -1,7 +1,7 @@
 import game
 
 
-def test_isValidSet():
+def test_is_valid_set():
 
     # Four, Four, Four -> True because there are three fours
     play0 = [
@@ -13,13 +13,13 @@ def test_isValidSet():
     # Ace, Two, Ace -> True because two is wild
     play1 = [
         game.Card(game.Name.ACE, game.Suit.DIAMONDS),
-        game.Card(game.Name.TWO, game.Suit.DIAMONDS),
+        game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
         game.Card(game.Name.ACE, game.Suit.CLUBS),
     ]
 
     # Joker, King, King -> True because Joker is wild
     play2 = [
-        game.Card(game.Name.JOKER, game.Suit.WILD),
+        game.Wild(game.Name.JOKER, game.Suit.WILD),
         game.Card(game.Name.KING, game.Suit.DIAMONDS),
         game.Card(game.Name.KING, game.Suit.CLUBS),
     ]
@@ -27,15 +27,15 @@ def test_isValidSet():
     # Ace, Two, Three -> False because Ace and Three are not of the same Set
     invalid_play0 = [
         game.Card(game.Name.ACE, game.Suit.DIAMONDS),
-        game.Card(game.Name.TWO, game.Suit.DIAMONDS),
+        game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
         game.Card(game.Name.THREE, game.Suit.CLUBS),
     ]
 
     # Joker, Two, Two -> False because there is no non-wild card
     invalid_play1 = [
-        game.Card(game.Name.JOKER, game.Suit.DIAMONDS),
-        game.Card(game.Name.TWO, game.Suit.DIAMONDS),
-        game.Card(game.Name.TWO, game.Suit.CLUBS),
+        game.Wild(game.Name.JOKER, game.Suit.WILD),
+        game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+        game.Wild(game.Name.TWO, game.Suit.CLUBS),
     ]
 
     # Six, Nine, Eight -> False because all different cards
@@ -62,20 +62,20 @@ def test_isValidSet():
     game_instance = game.Game()
 
     # Valid Sets
-    assert game_instance.isValidSet(play0) == True
-    assert game_instance.isValidSet(play1) == True
-    assert game_instance.isValidSet(play2) == True
+    assert game_instance.is_valid_set(play0) == True
+    assert game_instance.is_valid_set(play1) == True
+    assert game_instance.is_valid_set(play2) == True
 
     # Invalid Sets
-    assert game_instance.isValidSet(invalid_play0) == False
-    assert game_instance.isValidSet(invalid_play1) == False
-    assert game_instance.isValidSet(invalid_play2) == False
-    assert game_instance.isValidSet(invalid_one_card) == False
-    assert game_instance.isValidSet(invalid_four_card) == False
-    assert game_instance.isValidSet(invalid_no_card) == False
+    assert game_instance.is_valid_set(invalid_play0) == False
+    assert game_instance.is_valid_set(invalid_play1) == False
+    assert game_instance.is_valid_set(invalid_play2) == False
+    assert game_instance.is_valid_set(invalid_one_card) == False
+    assert game_instance.is_valid_set(invalid_four_card) == False
+    assert game_instance.is_valid_set(invalid_no_card) == False
 
 
-def test_isValidRun():
+def test_is_valid_run():
 
     # Valid runs
     # Three, Four, Five, Six, Seven of diamonds run
@@ -95,9 +95,9 @@ def test_isValidRun():
     ]
 
     wildcard1 = game.Wild(game.Name.TWO, game.Suit.CLUBS)
-    wildcard1.change_value("EIGHT")
+    wildcard1.set_value("EIGHT")
     wildcard2 = game.Wild(game.Name.JOKER, game.Suit.WILD)
-    wildcard2.change_value("NINE")
+    wildcard2.set_value("NINE")
 
     # Wild, Wild, Ten, Jack of Hearts run, it is valid because the wilds were given their temporary values before hand
     play2 = [
@@ -107,8 +107,8 @@ def test_isValidRun():
         game.Card(game.Name.JACK, game.Suit.HEARTS),
     ]
 
-    wildcard1.change_value("NINE")
-    wildcard2.change_value("QUEEN")
+    wildcard1.set_value("NINE")
+    wildcard2.set_value("QUEEN")
     # Ten, Wild , Jack, Wild of Diamonds run, it is valid because wilds are given temporary values before hand
     # and sorted before validation
     play3 = [
@@ -176,29 +176,29 @@ def test_isValidRun():
     game_instance = game.Game()
 
     # Valid runs
-    assert game_instance.isValidRun(play0) == True
-    assert game_instance.isValidRun(play1) == True
-    assert game_instance.isValidRun(play2) == True
-    assert game_instance.isValidRun(play3) == True
+    assert game_instance.is_valid_run(play0) == True
+    assert game_instance.is_valid_run(play1) == True
+    assert game_instance.is_valid_run(play2) == True
+    assert game_instance.is_valid_run(play3) == True
 
     # Invalid runs
-    assert game_instance.isValidRun(invalid_play0) == False
-    assert game_instance.isValidRun(invalid_play1) == False
-    assert game_instance.isValidRun(invalid_play2) == False
-    assert game_instance.isValidRun(invalid_play3) == False
-    assert game_instance.isValidRun(invalid_play4) == False
-    assert game_instance.isValidRun(invalid_play5) == False
-    assert game_instance.isValidRun(invalid_play6) == False
+    assert game_instance.is_valid_run(invalid_play0) == False
+    assert game_instance.is_valid_run(invalid_play1) == False
+    assert game_instance.is_valid_run(invalid_play2) == False
+    assert game_instance.is_valid_run(invalid_play3) == False
+    assert game_instance.is_valid_run(invalid_play4) == False
+    assert game_instance.is_valid_run(invalid_play5) == False
+    assert game_instance.is_valid_run(invalid_play6) == False
 
 
-def test_isValidRunRound7():
+def test_is_valid_runRound7():
     """Tests runs when game round is 7. Runs can be longer than 4"""
 
     # Valid runs
     wildcard1 = game.Wild(game.Name.TWO, game.Suit.CLUBS)
-    wildcard1.change_value("JACK")
+    wildcard1.set_value("JACK")
     wildcard2 = game.Wild(game.Name.JOKER, game.Suit.WILD)
-    wildcard2.change_value("QUEEN")
+    wildcard2.set_value("QUEEN")
 
     play0 = [
         game.Card(game.Name.THREE, game.Suit.DIAMONDS),
@@ -228,11 +228,11 @@ def test_isValidRunRound7():
     game_instance.round = 7
 
     # Valid runs
-    assert game_instance.isValidRun(play0) == True
-    assert game_instance.isValidRun(play1) == True
+    assert game_instance.is_valid_run(play0) == True
+    assert game_instance.is_valid_run(play1) == True
 
 
-def test_determineWinner():
+def test_determine_winner():
     """Tests if Winner is determined correctly"""
     players = [game.Player("Nestor"), game.Player("Jacob"), game.Player("Summer")]
 
@@ -242,16 +242,16 @@ def test_determineWinner():
 
     game_instance = game.Game()
     game_instance.players = players
-    assert game_instance.determineWinner()[0].name == "Jacob"
+    assert game_instance.determine_winner()[0].name == "Jacob"
 
     players[0].score = 100
     players[1].score = 50
     players[2].score = 50
 
-    winners = game_instance.determineWinner()
+    winners = game_instance.determine_winner()
     assert winners[0].name == "Jacob" and winners[1].name == "Summer"
 
     players[0].score = 0
     players = [game.Player("Nestor")]
     game_instance.players = players
-    assert game_instance.determineWinner()[0].name == "Nestor"
+    assert game_instance.determine_winner()[0].name == "Nestor"
