@@ -91,6 +91,42 @@ class Card:
         return self.name.value >= other.name.value
 
 
+class Player:
+    def __init__(self, name: str):
+        self.name = name
+        self.score = 0
+        self.hand = []
+
+    def addCard(self, card: Card) -> list:
+        return self.hand.append(card)
+
+    def __repr__(self):
+        hand_str = ", ".join(str(card) for card in self.hand)
+        return f"Player {self.name} | Score: {self.score} | Hand: [{hand_str}]"
+
+    def __str__(self):
+        hand_str = ", ".join(str(card) for card in self.hand)
+        return f"Player {self.name} | Score: {self.score} | Hand: [{hand_str}]"
+
+    def __lt__(self, other):
+        """Determines how players are compared to each other by their score"""
+        if not isinstance(other, Player):
+            raise NotImplemented
+        return self.score < other.score
+
+    def __gt__(self, other):
+        """Determines how players are compared to each other by their score"""
+        if not isinstance(other, Player):
+            raise NotImplemented
+        return self.score > other.score
+
+    def __eq__(self, other):
+        """Determines how players are compared to each other by their score"""
+        if not isinstance(other, Player):
+            raise NotImplemented
+        return self.score == other.score
+
+
 class Game:
     def __init__(self):
         self.players = [Player("A"), Player("B"), Player("C")]
@@ -142,6 +178,15 @@ class Game:
             self.shuffleDeck()
             self.discard = self.deck[-1:]
         return None
+
+    def determineWinner(self) -> list:
+        winner = [self.players[0]]
+        for player in self.players[1:]:
+            if player == winner[0] and player is not winner[0]:
+                winner.append(player)
+            if player < winner[0]:
+                winner = [player]
+        return winner
 
     def isValidSet(self, played_hand: list) -> bool:
         """Determines if the selected cards are a valid set.
@@ -272,20 +317,6 @@ class Game:
         return f"{self.players} {self.deck} {self.winner}"
 
 
-class Player:
-    def __init__(self, name: str):
-        self.name = name
-        self.score = 0
-        self.hand = []
-
-    def addCard(self, card: Card) -> list:
-        return self.hand.append(card)
-
-    def __str__(self):
-        hand_str = ", ".join(str(card) for card in self.hand)
-        return f"Player {self.name} | Score: {self.score} | Hand: [{hand_str}]"
-
-
 class Wild(Card):
     def __init__(self, name, suit):
         super().__init__(name, suit)
@@ -354,10 +385,3 @@ class Wild(Card):
 
 
 z = Game()
-
-wilds = [Wild(Name.TWO, Suit.WILD), Card(Name.FIVE, Suit.HEARTS)]
-print(wilds)
-
-wilds[0].change_suit("HEARTS")
-
-print(wilds)

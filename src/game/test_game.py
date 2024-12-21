@@ -230,3 +230,28 @@ def test_isValidRunRound7():
     # Valid runs
     assert game_instance.isValidRun(play0) == True
     assert game_instance.isValidRun(play1) == True
+
+
+def test_determineWinner():
+    """Tests if Winner is determined correctly"""
+    players = [game.Player("Nestor"), game.Player("Jacob"), game.Player("Summer")]
+
+    players[0].score = 100
+    players[1].score = 50
+    players[2].score = 150
+
+    game_instance = game.Game()
+    game_instance.players = players
+    assert game_instance.determineWinner()[0].name == "Jacob"
+
+    players[0].score = 100
+    players[1].score = 50
+    players[2].score = 50
+
+    winners = game_instance.determineWinner()
+    assert winners[0].name == "Jacob" and winners[1].name == "Summer"
+
+    players[0].score = 0
+    players = [game.Player("Nestor")]
+    game_instance.players = players
+    assert game_instance.determineWinner()[0].name == "Nestor"
