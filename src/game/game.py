@@ -5,12 +5,6 @@ Goal: Get a text version of the game to be able to played by one terminal
 
 Contains game logic and related classes
 
-
-12/20/2024
- - Left off on correctly adding is_valid_set(played_hand) to validate if played hand is a set
-    - Sorts cards in played hand to ensure at least one card is not a wildcard 
- - Need to move to Validate a run then decided how to test playing cards in a hand
-
 Future Considerations for game rules:
  - Minimum/Maximum players changing the cards dealt and deck count
 
@@ -55,7 +49,7 @@ class Card:
         self.suit = suit
         self.value = self._assign_value()
 
-    def _assign_value(self):
+    def _assign_value(self) -> int:
         """Assigns point value to card based on the values given to constructor."""
         if self.name.value >= 3 and self.name.value <= 9:
             return 5
@@ -97,11 +91,13 @@ class Player:
         self.score = 0
         self.hand = []
 
-    def add_card(self, card: Card) -> list:
+    def add_card(self, card: Card) -> None:
         return self.hand.append(card)
 
     def __repr__(self):
-        hand_str = ", ".join(str(card) for card in self.hand)
+        hand_str = ", ".join(str(card) for card in self.hand[:5]) + (
+            "..." if len(self.hand) > 5 else ""
+        )
         return f"Player {self.name} | Score: {self.score} | Hand: [{hand_str}]"
 
     def __str__(self):
@@ -111,24 +107,24 @@ class Player:
     def __lt__(self, other):
         """Determines how players are compared to each other by their score"""
         if not isinstance(other, Player):
-            raise NotImplemented
+            return NotImplemented
         return self.score < other.score
 
     def __gt__(self, other):
         """Determines how players are compared to each other by their score"""
         if not isinstance(other, Player):
-            raise NotImplemented
+            return NotImplemented
         return self.score > other.score
 
     def __eq__(self, other):
         """Determines how players are compared to each other by their score"""
         if not isinstance(other, Player):
-            raise NotImplemented
+            return NotImplemented
         return self.score == other.score
 
 
 class Game:
-    def __init__(self):
+    def __init__(self, num_players=3):
         self.players = [Player("A"), Player("B"), Player("C")]
         self.deck = self._generate_deck()
         self.discard = []
@@ -156,7 +152,7 @@ class Game:
             self.shuffle_deck()
         return self.deck.pop()
 
-    def shuffle_deck(self) -> list:
+    def shuffle_deck(self) -> None:
         """Shuffles self.deck and updates in place.
 
         It modifies the deck directly and can be called without storing the result.
@@ -174,7 +170,7 @@ class Game:
             for player in self.players:
                 player.add_card(self.draw_card())
         self.discard = self.deck[-1:]
-        while self.discard[0].value == 20:
+        while self.is_wild(self.discard[0]):
             self.shuffle_deck()
             self.discard = self.deck[-1:]
         return None
@@ -203,13 +199,15 @@ class Game:
         # Sort played hands based on the value
         played_hand.sort()
 
-        if played_hand[0].value == 20:
+        if self.is_wild(played_hand[0]):
             return False
 
         if (
-            played_hand[0].name != played_hand[1].name and played_hand[1].value != 20
+            played_hand[0].name != played_hand[1].name
+            and not self.is_wild(played_hand[1])
         ) or (
-            played_hand[0].name != played_hand[2].name and played_hand[2].value != 20
+            played_hand[0].name != played_hand[2].name
+            and not self.is_wild(played_hand[2])
         ):
             return False
 
@@ -226,12 +224,11 @@ class Game:
         """
 
         # if hand is not exactly 4 cards, if round 7 can be more than 4 cards but not less
-        if (self.round == 7 and (len(played_hand) < 4)) or (
+        if (self.round == 7 and len(played_hand) < 4) or (
             self.round != 7 and len(played_hand) != 4
         ):
             return False
 
-        # Sort played hands based on the value
         played_hand.sort()
 
         # if all cards are wild cards
@@ -239,7 +236,7 @@ class Game:
         # Take suit of first non wild
         suit = Suit.WILD
         for card in played_hand:
-            if card.suit != Suit.WILD and card.value != 20:
+            if not self.is_wild(card):
                 suit = card.suit
         if suit == Suit.WILD:
             return False
@@ -247,7 +244,7 @@ class Game:
         base_card = played_hand[0]
 
         for card in played_hand[1:3]:
-            if card.suit != suit and card.value != 20:
+            if card.suit != suit and not self.is_wild(card):
                 return False
 
         # if same suits but cards not in sequence
@@ -271,6 +268,9 @@ class Game:
                 return False
 
         return True
+
+    def is_wild(self, card: Card) -> bool:
+        return card.suit == Suit.WILD or card.value == 20
 
     # Display Functions #
 
@@ -324,10 +324,16 @@ class Wild(Card):
         self.chosen_suit = Suit.WILD
 
     def set_value(self, chosen: str) -> Name:
-        """Changes temporary name to card of users choice.
+        """Changes the wildcard's temporary value to a valid card name.
 
         Args:
-            chosen (str): Name of card user wants to use wild in place of.
+        chosen (str): The name of the card to substitute the wildcard for.
+
+        Raises:
+            InvalidChangeError: If the chosen name is invalid (JOKER or TWO).
+
+        Returns:
+            Name: The updated name assigned to the wildcard.
         """
         if chosen == "TWO" or chosen == "JOKER":
             raise InvalidChangeError
@@ -354,13 +360,12 @@ class Wild(Card):
         return self.chosen_suit
 
     def __repr__(self):
-        return (
-            super().__repr__()
-            + " - Temp value ->  "
-            + self.chosen_name.name
-            + " of "
-            + self.chosen_suit.name
+        chosen_value = (
+            f"{self.chosen_name.name} of {self.chosen_suit.name}"
+            if self.chosen_name != Name.INVALID
+            else "Not Set"
         )
+        return super().__repr__() + f" - Temp value -> {chosen_value}"
 
     def __str__(self):
         return (
@@ -388,13 +393,7 @@ class Wild(Card):
         return self.chosen_name.value > other.name.value
 
 
-play1 = [
-    Card(Name.ACE, Suit.DIAMONDS),
-    Wild(Name.TWO, Suit.DIAMONDS),
-    Card(Name.ACE, Suit.CLUBS),
-]
-print(play1)
-play1.sort()
-print(play1)
-
-print(type(play1[0]) == Wild)
+z = Game()
+z.shuffle_deck()
+z.deal_cards()
+z.display_discard()
