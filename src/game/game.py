@@ -5,6 +5,12 @@ Goal: Get a text version of the game to be able to played by one terminal
 
 Contains game logic and related classes
 
+
+12/20/2024
+ - Left off on correctly adding isValidSet(played_hand) to validate if played hand is a set
+    - Sorts cards in played hand to ensure at least one card is not a wildcard 
+ - Need to move to Validate a run then decided how to test playing cards in a hand
+
 Future Considerations for game rules:
  - Minimum/Maximum players changing the cards dealt and deck count
 
@@ -12,7 +18,7 @@ Future Considerations for game rules:
 """
 
 from enum import Enum
-from game_errors import EmptyDecksError
+from game_errors import EmptyDecksError, InvalidChangeError
 
 import random
 
@@ -26,6 +32,7 @@ class Suit(Enum):
 
 
 class Name(Enum):
+    INVALID = 0
     JOKER = 1
     TWO = 2
     THREE = 3
@@ -141,6 +148,7 @@ class Game:
         """
         if len(played_hand) != 3:
             return False
+
         # Sort played hands based on the value
         played_hand.sort()
 
@@ -155,6 +163,38 @@ class Game:
             return False
 
         return True
+
+    def isValidRun(self, played_hand: list) -> bool:
+        """Determines if the selected cards are a valid run.
+
+        Args:
+            played_hand (list): Selected cards to play as a run
+
+        Returns:
+            bool: True if valid run or False if invalid run.
+        """
+
+        # if hand is not exactly 4 cards
+        if len(played_hand) != 4:
+            return False
+
+        # Sort played hands based on the value
+        played_hand.sort()
+
+        # if all cards are wild cards
+        if played_hand[0].value == 20:
+            return False
+
+        # if multiple suits are played in same hand
+        base_card = played_hand[0]
+        for card in played_hand[1:3]:
+            if card.suit != base_card.suit and card.value != 20:
+                return False
+
+        # if same suits but cards not in sequence
+        for card in played_hand[1:3]:
+            if (played_hand[card.name - base_card.name] != card) and card.value != 20:
+                return False
 
     # Display Functions #
 
@@ -211,7 +251,34 @@ class Player:
         return f"Player {self.name} | Score: {self.score} | Hand: [{hand_str}]"
 
 
+class Wild(Card):
+    def __init__(self, name, suit):
+        super().__init__(name, suit)
+        self.chosen_name = Name.INVALID
+
+    def change_value(self, chosen: str) -> Name:
+        """Changes temporary name to card of users choice.
+
+        Args:
+            chosen (str): Name of card user wants to use wild in place of.
+        """
+        if chosen == "TWO" or chosen == "JOKER":
+            raise InvalidChangeError
+
+        for name in Name:
+            if chosen == name.name:
+                self.chosen_name = Name(name)
+
+        return self.chosen_name
+
+    def __repr__(self):
+        return super().__repr__() + self.chosen_name
+
+    def __str__(self):
+        return super().__str__() + " - Temp value ->  " + self.chosen_name.name
+
+
 z = Game()
-z.shuffleDeck()
-z.dealCards()
-z.displayDiscard()
+wild = Wild(Name.JOKER, Suit.JOKER)
+wild.change_value("THREE")
+print(wild)
