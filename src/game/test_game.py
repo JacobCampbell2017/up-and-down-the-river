@@ -189,3 +189,44 @@ def test_isValidRun():
     assert game_instance.isValidRun(invalid_play4) == False
     assert game_instance.isValidRun(invalid_play5) == False
     assert game_instance.isValidRun(invalid_play6) == False
+
+
+def test_isValidRunRound7():
+    """Tests runs when game round is 7. Runs can be longer than 4"""
+
+    # Valid runs
+    wildcard1 = game.Wild(game.Name.TWO, game.Suit.CLUBS)
+    wildcard1.change_value("JACK")
+    wildcard2 = game.Wild(game.Name.JOKER, game.Suit.WILD)
+    wildcard2.change_value("QUEEN")
+
+    play0 = [
+        game.Card(game.Name.THREE, game.Suit.DIAMONDS),
+        game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+        game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+        game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+        game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+        game.Card(game.Name.EIGHT, game.Suit.DIAMONDS),
+        game.Card(game.Name.NINE, game.Suit.DIAMONDS),
+        game.Card(game.Name.TEN, game.Suit.DIAMONDS),
+        game.Card(game.Name.KING, game.Suit.DIAMONDS),
+        game.Card(game.Name.ACE, game.Suit.DIAMONDS),
+        wildcard1,
+        wildcard2,
+    ]
+
+    # Ten, Jack, King, Queen of clubs run, it is valid but out of order and works
+    play1 = [
+        game.Card(game.Name.TEN, game.Suit.CLUBS),
+        game.Card(game.Name.JACK, game.Suit.CLUBS),
+        game.Card(game.Name.KING, game.Suit.CLUBS),
+        game.Card(game.Name.QUEEN, game.Suit.CLUBS),
+        game.Card(game.Name.ACE, game.Suit.CLUBS),
+    ]
+
+    game_instance = game.Game()
+    game_instance.round = 7
+
+    # Valid runs
+    assert game_instance.isValidRun(play0) == True
+    assert game_instance.isValidRun(play1) == True

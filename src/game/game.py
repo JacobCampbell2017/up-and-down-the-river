@@ -180,8 +180,10 @@ class Game:
             bool: True if valid run or False if invalid run.
         """
 
-        # if hand is not exactly 4 cards
-        if len(played_hand) != 4:
+        # if hand is not exactly 4 cards, if round 7 can be more than 4 cards but not less
+        if (self.round == 7 and (len(played_hand) < 4)) or (
+            self.round != 7 and len(played_hand) != 4
+        ):
             return False
 
         # Sort played hands based on the value
