@@ -9,6 +9,8 @@ Future Considerations for game rules:
  - Minimum/Maximum players changing the cards dealt and deck count
 
 
+12/23/2024
+FINISH LOGIC FOR VALID HANDS BASED ON ROUND
 """
 
 from enum import Enum
@@ -90,9 +92,20 @@ class Player:
         self.name = name
         self.score = 0
         self.hand = []
+        self.played_hands = []
 
     def add_card(self, card: Card) -> None:
         return self.hand.append(card)
+
+    def play_hand(self, cards: list) -> list:
+        return cards
+
+    def remove_cards(self, cards: list) -> list:
+        self.hand = [card for card in self.hand if card not in cards]
+        return self.hand
+
+    def has_leftover_card(self) -> bool:
+        return len(self.hand) >= 1
 
     def __repr__(self):
         hand_str = ", ".join(str(card) for card in self.hand[:5]) + (
@@ -184,34 +197,60 @@ class Game:
                 winner = [player]
         return winner
 
-    def is_valid_set(self, played_hand: list) -> bool:
-        """Determines if the selected cards are a valid set.
+    def is_valid_hand(self, played_hand: list[list], player: Player) -> bool:
+        """Determines if the played hands are valid according to the current round.
 
         Args:
-            played_hand (list): Selected cards to play as a set.
+            played_hand (list[list]): The list of hands played. Divided into players choice of cards.
 
         Returns:
-            bool: True if valid set or False if invalid set.
+            bool: True if every round requirement is met or false if incorrect hands for the current round.
         """
-        if len(played_hand) != 3:
-            return False
 
-        # Sort played hands based on the value
-        played_hand.sort()
+        # Match for rounds
+        copy_hand = played_hand.copy()
+        match (self.round):
+            case 1:
+                return (
+                    player.has_leftover_card()
+                    and self.is_valid_set(copy_hand[0])
+                    and self.is_valid_set(copy_hand[1])
+                )
 
-        if self.is_wild(played_hand[0]):
-            return False
+            case 2:
+                return player.has_leftover_card() and ()
 
-        if (
-            played_hand[0].name != played_hand[1].name
-            and not self.is_wild(played_hand[1])
-        ) or (
-            played_hand[0].name != played_hand[2].name
-            and not self.is_wild(played_hand[2])
-        ):
-            return False
+            case 3:
+                return (
+                    player.has_leftover_card()
+                    and self.is_valid_run(copy_hand[0])
+                    and self.is_valid_run(copy_hand[1])
+                )
 
-        return True
+            case 4:
+                return (
+                    player.has_leftover_card()
+                    and self.is_valid_set(copy_hand[0])
+                    and self.is_valid_set(copy_hand[1])
+                    and self.is_valid_set(copy_hand[2])
+                )
+
+            case 5:
+                pass
+
+            case 6:
+                pass
+
+            case 7:
+                return (
+                    not player.has_leftover_card()
+                    and self.is_valid_run(copy_hand[0])
+                    and self.is_valid_run(copy_hand[1])
+                    and self.is_valid_run(copy_hand[2])
+                )
+
+            case _:
+                raise ValueError
 
     def is_valid_run(self, played_hand: list) -> bool:
         """Determines if the selected cards are a valid run.
@@ -269,8 +308,40 @@ class Game:
 
         return True
 
+    def is_valid_set(self, played_hand: list) -> bool:
+        """Determines if the selected cards are a valid set.
+
+        Args:
+            played_hand (list): Selected cards to play as a set.
+
+        Returns:
+            bool: True if valid set or False if invalid set.
+        """
+        if len(played_hand) != 3:
+            return False
+
+        # Sort played hands based on the value
+        played_hand.sort()
+
+        if self.is_wild(played_hand[0]):
+            return False
+
+        if (
+            played_hand[0].name != played_hand[1].name
+            and not self.is_wild(played_hand[1])
+        ) or (
+            played_hand[0].name != played_hand[2].name
+            and not self.is_wild(played_hand[2])
+        ):
+            return False
+
+        return True
+
     def is_wild(self, card: Card) -> bool:
         return card.suit == Suit.WILD or card.value == 20
+
+    def play_hands(self, player: Player, played_hand: list[list]) -> bool:
+        pass
 
     # Display Functions #
 
