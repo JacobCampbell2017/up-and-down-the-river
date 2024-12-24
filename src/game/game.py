@@ -78,13 +78,38 @@ class Card:
         """Defines how cards are compared for sorting"""
         if not isinstance(other, Card):
             return NotImplemented
-        return self.name.value < other.name.value
 
-    def __gt__(self, other):
-        """Defines how cards are compared for sorting"""
-        if not isinstance(other, Card):
-            return NotImplemented
-        return self.name.value >= other.name.value
+        # Self is Wild
+        if isinstance(self, Wild):
+            # Both Wilds
+            if isinstance(other, Wild):
+                # Non-Temp Wilds
+                if (
+                    self.chosen_name == Name.INVALID
+                    and other.chosen_name == Name.INVALID
+                ):
+                    return self.value < other.value
+                # Other is Temp Wild
+                if self.chosen_name == Name.INVALID:
+                    return self.value < other.chosen_name.value
+                # Self is Temp Wild
+                if other.chosen_name == Name.INVALID:
+                    return self.chosen_name.value < other.value
+                # Both are Temp Wilds
+                return self.chosen_name.value < other.chosen_name.value
+            # Self is Non-Temp Wild
+            if self.chosen_name != Name.INVALID:
+                return self.chosen_name.value < other.name.value
+            # Self is Temp Wild
+            return self.chosen_name.value < other.name.value
+        if isinstance(other, Wild):
+            # Other is Non-Temp Wild
+            if other.chosen_name == Name.INVALID:
+                return self.name.value < other.value
+            # Other is a Temp Wild
+            return self.name.value < other.chosen_name.value
+        # BUNCH O NORMIES
+        return self.name.value < other.name.value
 
 
 class Player:
@@ -165,16 +190,6 @@ class Game:
             self.shuffle_deck()
         return self.deck.pop()
 
-    def shuffle_deck(self) -> None:
-        """Shuffles self.deck and updates in place.
-
-        It modifies the deck directly and can be called without storing the result.
-
-        Returns:
-            list: the shuffled deck
-        """
-        return random.shuffle(self.deck)
-
     def deal_cards(self, num_of_cards=11) -> None:
         """Adds a specified Cards to every players hand. The deck continues to be shuffled until the top card that is
         added to the discard pile is not a wild card.
@@ -197,7 +212,7 @@ class Game:
                 winner = [player]
         return winner
 
-    def is_valid_hand(self, played_hand: list[list], player: Player) -> bool:
+    def is_valid_play_down(self, played_hand: list[list]) -> bool:
         """Determines if the played hands are valid according to the current round.
 
         Args:
@@ -212,38 +227,58 @@ class Game:
         match (self.round):
             case 1:
                 return (
-                    player.has_leftover_card()
+                    len(played_hand) == 2
                     and self.is_valid_set(copy_hand[0])
                     and self.is_valid_set(copy_hand[1])
                 )
 
             case 2:
-                return player.has_leftover_card() and ()
+                # The issue is do I want to allow the player to select their group of cards in any order?
+                # i.e (if round 2, player selects set first, then run. OR The player can choose the run first or set.)
+                # Limiting the choice of what the player wants to select makes this part easier. Always setting sets firsts
+                # makes testing easier
+
+                # Make sets chosen first, later on in development perhaps comeback to allow for either order
+                return (
+                    len(played_hand) == 2
+                    and self.is_valid_set(copy_hand[0])
+                    and self.is_valid_run(copy_hand[1])
+                )
 
             case 3:
                 return (
-                    player.has_leftover_card()
+                    len(played_hand) == 2
                     and self.is_valid_run(copy_hand[0])
                     and self.is_valid_run(copy_hand[1])
                 )
 
             case 4:
                 return (
-                    player.has_leftover_card()
+                    len(played_hand) == 3
                     and self.is_valid_set(copy_hand[0])
                     and self.is_valid_set(copy_hand[1])
                     and self.is_valid_set(copy_hand[2])
                 )
 
             case 5:
-                pass
+                return (
+                    len(played_hand) == 3
+                    and self.is_valid_set(copy_hand[0])
+                    and self.is_valid_set(copy_hand[1])
+                    and self.is_valid_run(copy_hand[2])
+                )
 
             case 6:
-                pass
+                return (
+                    len(played_hand) == 3
+                    and self.is_valid_set(copy_hand[0])
+                    and self.is_valid_run(copy_hand[1])
+                    and self.is_valid_run(copy_hand[2])
+                )
 
             case 7:
                 return (
-                    not player.has_leftover_card()
+                    len(played_hand) == 3
                     and self.is_valid_run(copy_hand[0])
                     and self.is_valid_run(copy_hand[1])
                     and self.is_valid_run(copy_hand[2])
@@ -269,6 +304,7 @@ class Game:
             return False
 
         played_hand.sort()
+        print(played_hand)
 
         # if all cards are wild cards
         # if multiple suits are played in same hand
@@ -342,6 +378,16 @@ class Game:
 
     def play_hands(self, player: Player, played_hand: list[list]) -> bool:
         pass
+
+    def shuffle_deck(self) -> None:
+        """Shuffles self.deck and updates in place.
+
+        It modifies the deck directly and can be called without storing the result.
+
+        Returns:
+            list: the shuffled deck
+        """
+        return random.shuffle(self.deck)
 
     # Display Functions #
 
@@ -454,17 +500,3 @@ class Wild(Card):
         if isinstance(other, Card) and self.chosen_name == Name.INVALID:
             return self.value < other.name.value
         return self.chosen_name.value < other.name.value
-
-    def __gt__(self, other):
-        """Defines the way wildcards are compared to others"""
-        if not isinstance(other, Card):
-            return NotImplemented
-        if isinstance(other, Card) and self.chosen_name == Name.INVALID:
-            return self.value > other.name.value
-        return self.chosen_name.value > other.name.value
-
-
-z = Game()
-z.shuffle_deck()
-z.deal_cards()
-z.display_discard()

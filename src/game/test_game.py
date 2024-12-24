@@ -255,3 +255,142 @@ def test_determine_winner():
     players = [game.Player("Nestor")]
     game_instance.players = players
     assert game_instance.determine_winner()[0].name == "Nestor"
+
+
+def test_round_1():
+    game_instance = game.Game()
+    game_instance.round = 1
+
+    # Valid Hands
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == True
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == True
+    )
+
+    # Invalid Hands
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.JOKER, game.Suit.WILD),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == False
+    )
+
+
+def test_round_2():
+    pass
+
+
+def test_round_3():
+    pass
+
+
+def test_round_4():
+    pass
+
+
+def test_round_5():
+    pass
+
+
+def test_round_6():
+    pass
+
+
+def test_round_7():
+    pass
