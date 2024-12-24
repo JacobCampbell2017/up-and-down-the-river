@@ -285,12 +285,12 @@ def test_round_1():
             [
                 [
                     game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
-                    game.Card(game.Name.JOKER, game.Suit.WILD),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
                     game.Card(game.Name.FOUR, game.Suit.CLUBS),
                 ],
                 [
                     game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
-                    game.Card(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
                     game.Card(game.Name.FIVE, game.Suit.CLUBS),
                 ],
             ]
@@ -340,12 +340,12 @@ def test_round_1():
             [
                 [
                     game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
-                    game.Card(game.Name.JOKER, game.Suit.WILD),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
                     game.Card(game.Name.FOUR, game.Suit.CLUBS),
                 ],
                 [
                     game.Card(game.Name.SIX, game.Suit.DIAMONDS),
-                    game.Card(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
                     game.Card(game.Name.FIVE, game.Suit.CLUBS),
                 ],
             ]
@@ -357,13 +357,13 @@ def test_round_1():
         game_instance.is_valid_play_down(
             [
                 [
-                    game.Card(game.Name.JOKER, game.Suit.WILD),
-                    game.Card(game.Name.JOKER, game.Suit.WILD),
-                    game.Card(game.Name.JOKER, game.Suit.WILD),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
                 ],
                 [
                     game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
-                    game.Card(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
                     game.Card(game.Name.FIVE, game.Suit.CLUBS),
                 ],
             ]
