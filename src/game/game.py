@@ -78,38 +78,13 @@ class Card:
         """Defines how cards are compared for sorting"""
         if not isinstance(other, Card):
             return NotImplemented
-
-        # Self is Wild
-        if isinstance(self, Wild):
-            # Both Wilds
-            if isinstance(other, Wild):
-                # Non-Temp Wilds
-                if (
-                    self.chosen_name == Name.INVALID
-                    and other.chosen_name == Name.INVALID
-                ):
-                    return self.value < other.value
-                # Other is Temp Wild
-                if self.chosen_name == Name.INVALID:
-                    return self.value < other.chosen_name.value
-                # Self is Temp Wild
-                if other.chosen_name == Name.INVALID:
-                    return self.chosen_name.value < other.value
-                # Both are Temp Wilds
-                return self.chosen_name.value < other.chosen_name.value
-            # Self is Non-Temp Wild
-            if self.chosen_name != Name.INVALID:
-                return self.chosen_name.value < other.name.value
-            # Self is Temp Wild
-            return self.chosen_name.value < other.name.value
-        if isinstance(other, Wild):
-            # Other is Non-Temp Wild
-            if other.chosen_name == Name.INVALID:
-                return self.name.value < other.value
-            # Other is a Temp Wild
-            return self.name.value < other.chosen_name.value
-        # BUNCH O NORMIES
         return self.name.value < other.name.value
+
+    def __gt__(self, other):
+        """Defines how cards are compared for sorting"""
+        if not isinstance(other, Card):
+            return NotImplemented
+        return self.name.value >= other.name.value
 
 
 class Player:
@@ -500,3 +475,11 @@ class Wild(Card):
         if isinstance(other, Card) and self.chosen_name == Name.INVALID:
             return self.value < other.name.value
         return self.chosen_name.value < other.name.value
+
+    def __gt__(self, other):
+        """Defines the way wildcards are compared to others"""
+        if not isinstance(other, Card):
+            return NotImplemented
+        if isinstance(other, Card) and self.chosen_name == Name.INVALID:
+            return self.value > other.name.value
+        return self.chosen_name.value > other.name.value
