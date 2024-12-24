@@ -166,11 +166,16 @@ def test_is_valid_run():
         game.Card(game.Name.EIGHT, game.Suit.DIAMONDS),
         game.Card(game.Name.NINE, game.Suit.DIAMONDS),
     ]
+
+    wildcard3 = game.Wild(game.Name.JOKER, game.Suit.WILD)
+    wildcard4 = game.Wild(game.Name.JOKER, game.Suit.WILD)
+    wildcard3.set_value("TEN")
+    wildcard4.set_value("JACK")
     invalid_play6 = [
         wildcard1,
         wildcard2,
-        wildcard2,
-        wildcard2,
+        wildcard3,
+        wildcard4,
     ]
 
     game_instance = game.Game()
@@ -371,26 +376,1066 @@ def test_round_1():
         == False
     )
 
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.SIX, game.Suit.CLUBS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
+
 
 def test_round_2():
-    pass
+    game_instance = game.Game()
+    game_instance.round = 2
+
+    # Valid Hands
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.JACK, game.Suit.DIAMONDS),
+                    game.Card(game.Name.JACK, game.Suit.HEARTS),
+                    game.Card(game.Name.JACK, game.Suit.SPADES),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == True
+    )
+
+    wildcard1 = game.Wild(game.Name.TWO, game.Suit.SPADES)
+    wildcard1.set_value("JACK")
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.HEARTS),
+                    game.Card(game.Name.FOUR, game.Suit.SPADES),
+                ],
+                [
+                    game.Card(game.Name.NINE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.TEN, game.Suit.DIAMONDS),
+                    wildcard1,
+                    game.Card(game.Name.QUEEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == True
+    )
+
+    wildcard1 = game.Wild(game.Name.TWO, game.Suit.SPADES)
+    wildcard1.set_value("NINE")
+    wildcard2 = game.Wild(game.Name.TWO, game.Suit.CLUBS)
+    wildcard2.set_value("JACK")
+    wildcard3 = game.Wild(game.Name.JOKER, game.Suit.WILD)
+    wildcard3.set_value("EIGHT")
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.HEARTS),
+                    game.Card(game.Name.FOUR, game.Suit.SPADES),
+                ],
+                [
+                    wildcard2,
+                    game.Card(game.Name.TEN, game.Suit.DIAMONDS),
+                    wildcard1,
+                    wildcard3,
+                ],
+            ]
+        )
+        == True
+    )
+
+    # Invalid Hands
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.HEARTS),
+                    game.Card(game.Name.FIVE, game.Suit.HEARTS),
+                    game.Card(game.Name.SIX, game.Suit.HEARTS),
+                    game.Card(game.Name.SEVEN, game.Suit.HEARTS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.HEARTS),
+                    game.Card(game.Name.FOUR, game.Suit.SPADES),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    wildcard4 = game.Wild(game.Name.JOKER, game.Suit.WILD)
+    wildcard4.set_value("TEN")
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.HEARTS),
+                    game.Card(game.Name.FOUR, game.Suit.SPADES),
+                ],
+                [
+                    wildcard2,
+                    wildcard4,
+                    wildcard1,
+                    wildcard3,
+                ],
+            ]
+        )
+        == False
+    )
 
 
 def test_round_3():
-    pass
+    game_instance = game.Game()
+    game_instance.round = 3
+
+    # Valid Hands
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == True
+    )
+
+    wildcard1 = game.Wild(game.Name.TWO, game.Suit.SPADES)
+    wildcard1.set_value("JACK")
+    wildcard2 = game.Wild(game.Name.TWO, game.Suit.CLUBS)
+    wildcard2.set_value("JACK")
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.NINE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.TEN, game.Suit.DIAMONDS),
+                    wildcard2,
+                    game.Card(game.Name.QUEEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.NINE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.TEN, game.Suit.DIAMONDS),
+                    wildcard1,
+                    game.Card(game.Name.QUEEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == True
+    )
+
+    # Invalid Hands
+    wildcard1 = game.Wild(game.Name.TWO, game.Suit.SPADES)
+    wildcard1.set_value("NINE")
+    wildcard2 = game.Wild(game.Name.TWO, game.Suit.CLUBS)
+    wildcard2.set_value("JACK")
+    wildcard3 = game.Wild(game.Name.JOKER, game.Suit.WILD)
+    wildcard3.set_value("EIGHT")
+    wildcard4 = game.Wild(game.Name.JOKER, game.Suit.WILD)
+    wildcard4.set_value("TEN")
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.HEARTS),
+                    game.Card(game.Name.FOUR, game.Suit.SPADES),
+                ],
+                [
+                    wildcard2,
+                    game.Card(game.Name.TEN, game.Suit.DIAMONDS),
+                    wildcard1,
+                    wildcard3,
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    wildcard4,
+                    wildcard2,
+                    wildcard1,
+                    wildcard3,
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.HEARTS),
+                    game.Card(game.Name.FIVE, game.Suit.HEARTS),
+                    game.Card(game.Name.SIX, game.Suit.HEARTS),
+                    game.Card(game.Name.SEVEN, game.Suit.HEARTS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.HEARTS),
+                    game.Card(game.Name.FOUR, game.Suit.SPADES),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    wildcard4 = game.Wild(game.Name.JOKER, game.Suit.WILD)
+    wildcard4.set_value("TEN")
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.HEARTS),
+                    game.Card(game.Name.FOUR, game.Suit.SPADES),
+                ],
+                [
+                    wildcard2,
+                    wildcard4,
+                    wildcard1,
+                    wildcard3,
+                ],
+            ]
+        )
+        == False
+    )
 
 
 def test_round_4():
-    pass
+    game_instance = game.Game()
+    game_instance.round = 4
+
+    # Valid Hands
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == True
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                ],
+            ]
+        )
+        == True
+    )
+
+    # Invalid Hands
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.SIX, game.Suit.CLUBS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
 
 
 def test_round_5():
-    pass
+    game_instance = game.Game()
+    game_instance.round = 5
+
+    # Valid Hands
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.SIX, game.Suit.HEARTS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.EIGHT, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.NINE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == True
+    )
+
+    wildcard3 = game.Wild(game.Name.TWO, game.Suit.DIAMONDS)
+    wildcard3.set_value("SIX")
+    wildcard4 = game.Wild(game.Name.TWO, game.Suit.DIAMONDS)
+    wildcard4.set_value("SEVEN")
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.ACE, game.Suit.SPADES),
+                    game.Card(game.Name.ACE, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    wildcard3,
+                    wildcard4,
+                    game.Card(game.Name.EIGHT, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == True
+    )
+
+    # Invalid Hands
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.ACE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.JACK, game.Suit.DIAMONDS),
+                    game.Card(game.Name.QUEEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    wildcard3,
+                    wildcard4,
+                    game.Card(game.Name.EIGHT, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
 
 
 def test_round_6():
-    pass
+    game_instance = game.Game()
+    game_instance.round = 6
+
+    # Valid Hands
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                    game.Card(game.Name.EIGHT, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.EIGHT, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.NINE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == True
+    )
+
+    wildcard1 = game.Wild(game.Name.JOKER, game.Suit.WILD)
+    wildcard1.set_value("SIX")
+    wildcard2 = game.Wild(game.Name.TWO, game.Suit.DIAMONDS)
+    wildcard2.set_value("KING")
+    wildcard3 = game.Wild(game.Name.TWO, game.Suit.DIAMONDS)
+    wildcard3.set_value("SIX")
+    wildcard4 = game.Wild(game.Name.TWO, game.Suit.DIAMONDS)
+    wildcard4.set_value("SEVEN")
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.ACE, game.Suit.DIAMONDS),
+                    wildcard2,
+                    game.Card(game.Name.JACK, game.Suit.DIAMONDS),
+                    game.Card(game.Name.QUEEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    wildcard3,
+                    wildcard4,
+                    game.Card(game.Name.EIGHT, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == True
+    )
+
+    # Invalid Hands
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                    wildcard1,
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.ACE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.ACE, game.Suit.SPADES),
+                    game.Card(game.Name.ACE, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    wildcard3,
+                    wildcard4,
+                    game.Card(game.Name.EIGHT, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
 
 
 def test_round_7():
-    pass
+    game_instance = game.Game()
+    game_instance.round = 7
+
+    # Valid Hands
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                    game.Card(game.Name.EIGHT, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.EIGHT, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.NINE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == True
+    )
+
+    wildcard1 = game.Wild(game.Name.JOKER, game.Suit.WILD)
+    wildcard1.set_value("SIX")
+    wildcard2 = game.Wild(game.Name.TWO, game.Suit.DIAMONDS)
+    wildcard2.set_value("KING")
+    wildcard3 = game.Wild(game.Name.TWO, game.Suit.DIAMONDS)
+    wildcard3.set_value("SIX")
+    wildcard4 = game.Wild(game.Name.TWO, game.Suit.DIAMONDS)
+    wildcard4.set_value("SEVEN")
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                    wildcard1,
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.ACE, game.Suit.DIAMONDS),
+                    wildcard2,
+                    game.Card(game.Name.JACK, game.Suit.DIAMONDS),
+                    game.Card(game.Name.QUEEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    wildcard3,
+                    wildcard4,
+                    game.Card(game.Name.EIGHT, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == True
+    )
+
+    # Invalid Hands
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                    wildcard1,
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.ACE, game.Suit.DIAMONDS),
+                    wildcard2,
+                    game.Card(game.Name.JACK, game.Suit.DIAMONDS),
+                    game.Card(game.Name.QUEEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    wildcard3,
+                    wildcard4,
+                    game.Card(game.Name.EIGHT, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Card(game.Name.FOUR, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                    game.Wild(game.Name.JOKER, game.Suit.WILD),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+                [
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Wild(game.Name.TWO, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.CLUBS),
+                ],
+            ]
+        )
+        == False
+    )
+
+    assert (
+        game_instance.is_valid_play_down(
+            [
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+                [
+                    game.Card(game.Name.FOUR, game.Suit.DIAMONDS),
+                    game.Card(game.Name.FIVE, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SIX, game.Suit.DIAMONDS),
+                    game.Card(game.Name.SEVEN, game.Suit.DIAMONDS),
+                ],
+            ]
+        )
+        == False
+    )

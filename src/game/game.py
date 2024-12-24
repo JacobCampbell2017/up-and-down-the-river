@@ -472,14 +472,21 @@ class Wild(Card):
         """Defines the way wildcards are compared to others"""
         if not isinstance(other, Card):
             return NotImplemented
+        if isinstance(other, Wild) and other.chosen_name != Name.INVALID:
+            if isinstance(self, Wild) and self.chosen_name != Name.INVALID:
+                return self.chosen_name.value < other.chosen_name.value
         if isinstance(other, Card) and self.chosen_name == Name.INVALID:
             return self.value < other.name.value
+
         return self.chosen_name.value < other.name.value
 
     def __gt__(self, other):
         """Defines the way wildcards are compared to others"""
         if not isinstance(other, Card):
             return NotImplemented
+        if isinstance(other, Wild) and other.chosen_name != Name.INVALID:
+            if isinstance(self, Wild) and self.chosen_name != Name.INVALID:
+                return self.chosen_name.value > other.chosen_name.value
         if isinstance(other, Card) and self.chosen_name == Name.INVALID:
             return self.value > other.name.value
         return self.chosen_name.value > other.name.value
