@@ -36,10 +36,11 @@ class Name(Enum):
 
 
 class Card:
-    def __init__(self, name: Name, suit: Suit):
+    def __init__(self, name: Name, suit: Suit, id: int = -1):
         self.name = name
         self.suit = suit
         self.value = self._assign_value()
+        self.id = id
 
     def _assign_value(self) -> int:
         """Assigns point value to card based on the values given to constructor."""
@@ -54,15 +55,15 @@ class Card:
 
     def __repr__(self):
         if self.name.name == "JOKER":
-            return "JOKER"
+            return f"ID: {self.id} JOKER"
         else:
-            return f"{self.name.name} of {self.suit.name}"
+            return f"ID {self.id}: {self.name.name} of {self.suit.name}"
 
     def __str__(self):
         if self.name.name == "JOKER":
             return "JOKER"
         else:
-            return f"{self.name.name} of {self.suit.name}"
+            return f"ID: {self.id} {self.name.name} of {self.suit.name}"
 
     def __lt__(self, other):
         """Defines how cards are compared for sorting"""
@@ -78,8 +79,8 @@ class Card:
 
 
 class Wild(Card):
-    def __init__(self, name, suit):
-        super().__init__(name, suit)
+    def __init__(self, name, suit, id=-1):
+        super().__init__(name, suit, id)
         self.chosen_name = Name.INVALID
         self.chosen_suit = Suit.WILD
 

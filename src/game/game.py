@@ -72,6 +72,22 @@ class Game:
                 winner = [player]
         return winner
 
+    def play_down(self, player: Player, played_hand: list[list]) -> bool:
+        temp = []
+        if self.is_valid_play_down(played_hand):
+            player.play_hand(played_hand)
+            for hand in played_hand:
+                player.remove_cards(hand)
+                temp.append(hand)
+            if player.has_leftover_card() and self.round != 7:
+                return True
+            if not player.has_leftover_card() and self.round == 7:
+                return True
+            for ls in temp:
+                for card in ls:
+                    player.add_card(card)
+        return False
+
     def is_valid_play_down(self, played_hand: list[list]) -> bool:
         """Determines if the played hands are valid according to the current round.
 
@@ -271,16 +287,27 @@ class Game:
     # Game Setup #
 
     def _generate_deck(self) -> list:
+        id = 1
         deck = []
         for suit in list(Suit)[:4]:
             for name in list(Name)[2:]:
                 if name == Name.TWO:
-                    deck.append(Wild(name, suit))
+                    deck.append(Wild(name, suit, id))
+                    id += 1
+                    deck.append(Wild(name, suit, id))
+                    id += 1
                 else:
-                    deck.append(Card(name, suit))
-        deck.extend([Wild(Name.JOKER, Suit.WILD) for _ in range(2)])
+                    deck.append(Card(name, suit, id))
+                    id += 1
+                    deck.append(Card(name, suit, id))
+                    id += 1
+        for _ in range(2):
+            deck.append(Wild(Name.JOKER, Suit.WILD, id))
+            id += 1
+            deck.append(Wild(Name.JOKER, Suit.WILD, id))
+            id += 1
 
-        return deck * 2
+        return deck
 
     def _generate_players(self, num: int) -> list:
         players = []
@@ -292,3 +319,37 @@ class Game:
 
     def __repr__(self):
         return f"{self.players} {self.deck} {self.winner}"
+
+
+g = Game()
+g.round = 1
+g.display_players()
+g.players[0].hand = [
+    Card(Name.FOUR, Suit.DIAMONDS, 1),
+    Card(Name.FOUR, Suit.DIAMONDS, 2),
+    Card(Name.FOUR, Suit.CLUBS, 3),
+    Card(Name.FIVE, Suit.DIAMONDS, 4),
+    Card(Name.FIVE, Suit.DIAMONDS, 5),
+    Card(Name.FIVE, Suit.CLUBS, 6),
+    Card(Name.FOUR, Suit.DIAMONDS, 7),
+    Card(Name.FOUR, Suit.DIAMONDS, 8),
+    Card(Name.FOUR, Suit.CLUBS, 9),
+]
+
+g.display_players()
+g.play_down(
+    g.players[0],
+    [
+        [
+            Card(Name.FOUR, Suit.DIAMONDS, 1),
+            Card(Name.FOUR, Suit.DIAMONDS, 2),
+            Card(Name.FOUR, Suit.CLUBS, 3),
+        ],
+        [
+            Card(Name.FIVE, Suit.DIAMONDS, 4),
+            Card(Name.FIVE, Suit.DIAMONDS, 5),
+            Card(Name.FIVE, Suit.CLUBS, 6),
+        ],
+    ],
+)
+g.display_players()
