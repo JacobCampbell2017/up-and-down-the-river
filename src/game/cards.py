@@ -6,6 +6,7 @@ Contains classes for Card and Wild
 """
 
 from enum import Enum
+from game_errors import InvalidChangeError
 
 
 class Suit(Enum):
