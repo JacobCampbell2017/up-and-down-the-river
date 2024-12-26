@@ -1441,3 +1441,191 @@ def test_round_7():
         )
         == False
     )
+
+
+def test_play_down():
+    g = game.Game()
+
+    # Round 1
+    g.round = 1
+    g.players[0].hand = [
+        Card(Name.FOUR, Suit.DIAMONDS, 1),
+        Card(Name.FOUR, Suit.HEARTS, 2),
+        Card(Name.FOUR, Suit.CLUBS, 3),
+        Card(Name.FIVE, Suit.DIAMONDS, 4),
+        Card(Name.FIVE, Suit.HEARTS, 5),
+        Card(Name.FIVE, Suit.CLUBS, 6),
+        Card(Name.NINE, Suit.CLUBS, 7),
+    ]
+
+    assert g.play_down(
+        g.players[0],
+        [
+            [
+                Card(Name.FOUR, Suit.DIAMONDS, 1),
+                Card(Name.FOUR, Suit.HEARTS, 2),
+                Card(Name.FOUR, Suit.CLUBS, 3),
+            ],
+            [
+                Card(Name.FIVE, Suit.DIAMONDS, 4),
+                Card(Name.FIVE, Suit.HEARTS, 5),
+                Card(Name.FIVE, Suit.CLUBS, 6),
+            ],
+        ],
+    )
+
+    g.players[0].hand = [
+        Card(Name.FOUR, Suit.DIAMONDS, 1),
+        Card(Name.FOUR, Suit.HEARTS, 2),
+        Card(Name.FIVE, Suit.DIAMONDS, 3),
+    ]
+
+    assert not g.play_down(
+        g.players[0],
+        [
+            [Card(Name.FOUR, Suit.DIAMONDS, 1), Card(Name.FOUR, Suit.HEARTS, 2)],
+            [Card(Name.FIVE, Suit.DIAMONDS, 3)],
+        ],
+    )
+
+    # Round 2
+    g.round = 2
+    g.players[0].hand = [
+        Card(Name.THREE, Suit.HEARTS, 1),
+        Card(Name.FOUR, Suit.HEARTS, 2),
+        Card(Name.FIVE, Suit.HEARTS, 3),
+        Card(Name.SIX, Suit.HEARTS, 4),
+        Card(Name.SEVEN, Suit.HEARTS, 5),
+        Card(Name.FIVE, Suit.DIAMONDS, 6),
+        Card(Name.FIVE, Suit.CLUBS, 7),
+        Card(Name.FIVE, Suit.SPADES, 8),
+    ]
+
+    assert g.play_down(
+        g.players[0],
+        [
+            [
+                Card(Name.FIVE, Suit.DIAMONDS, 6),
+                Card(Name.FIVE, Suit.CLUBS, 7),
+                Card(Name.FIVE, Suit.SPADES, 8),
+            ],
+            [
+                Card(Name.THREE, Suit.HEARTS, 1),
+                Card(Name.FOUR, Suit.HEARTS, 2),
+                Card(Name.FIVE, Suit.HEARTS, 3),
+                Card(Name.SIX, Suit.HEARTS, 4),
+            ],
+        ],
+    )
+
+    # Round 3
+    g.round = 3
+    g.players[0].hand = [
+        Card(Name.THREE, Suit.CLUBS, 1),
+        Card(Name.FOUR, Suit.CLUBS, 2),
+        Card(Name.FIVE, Suit.CLUBS, 3),
+        Card(Name.SIX, Suit.CLUBS, 4),
+        Card(Name.SEVEN, Suit.DIAMONDS, 5),
+        Card(Name.EIGHT, Suit.DIAMONDS, 6),
+        Card(Name.NINE, Suit.DIAMONDS, 7),
+        Card(Name.TEN, Suit.DIAMONDS, 8),
+        Card(Name.THREE, Suit.SPADES, 9),
+    ]
+
+    assert g.play_down(
+        g.players[0],
+        [
+            [
+                Card(Name.THREE, Suit.CLUBS, 1),
+                Card(Name.FOUR, Suit.CLUBS, 2),
+                Card(Name.FIVE, Suit.CLUBS, 3),
+                Card(Name.SIX, Suit.CLUBS, 4),
+            ],
+            [
+                Card(Name.SEVEN, Suit.DIAMONDS, 5),
+                Card(Name.EIGHT, Suit.DIAMONDS, 6),
+                Card(Name.NINE, Suit.DIAMONDS, 7),
+                Card(Name.TEN, Suit.DIAMONDS, 8),
+            ],
+        ],
+    )
+
+    # Round 4
+    g.round = 4
+    g.players[0].hand = [
+        Card(Name.THREE, Suit.CLUBS, 1),
+        Card(Name.THREE, Suit.HEARTS, 2),
+        Card(Name.THREE, Suit.SPADES, 3),
+        Card(Name.SIX, Suit.CLUBS, 4),
+        Card(Name.SIX, Suit.HEARTS, 5),
+        Card(Name.SIX, Suit.SPADES, 6),
+        Card(Name.NINE, Suit.CLUBS, 7),
+        Card(Name.NINE, Suit.HEARTS, 8),
+        Card(Name.NINE, Suit.SPADES, 9),
+        Card(Name.TEN, Suit.DIAMONDS, 10),
+    ]
+
+    assert g.play_down(
+        g.players[0],
+        [
+            [
+                Card(Name.THREE, Suit.CLUBS, 1),
+                Card(Name.THREE, Suit.HEARTS, 2),
+                Card(Name.THREE, Suit.SPADES, 3),
+            ],
+            [
+                Card(Name.SIX, Suit.CLUBS, 4),
+                Card(Name.SIX, Suit.HEARTS, 5),
+                Card(Name.SIX, Suit.SPADES, 6),
+            ],
+            [
+                Card(Name.NINE, Suit.CLUBS, 7),
+                Card(Name.NINE, Suit.HEARTS, 8),
+                Card(Name.NINE, Suit.SPADES, 9),
+            ],
+        ],
+    )
+
+    # Round 7
+    g.round = 7
+    g.players[0].hand = [
+        Wild(Name.TWO, Suit.WILD, 1),
+        Card(Name.THREE, Suit.CLUBS, 2),
+        Card(Name.FOUR, Suit.CLUBS, 3),
+        Card(Name.FIVE, Suit.CLUBS, 4),
+        Card(Name.FOUR, Suit.HEARTS, 5),
+        Card(Name.FIVE, Suit.HEARTS, 6),
+        Card(Name.SIX, Suit.HEARTS, 7),
+        Card(Name.SEVEN, Suit.HEARTS, 8),
+        Card(Name.EIGHT, Suit.HEARTS, 9),
+        Card(Name.NINE, Suit.DIAMONDS, 10),
+        Card(Name.TEN, Suit.DIAMONDS, 11),
+        Card(Name.JACK, Suit.DIAMONDS, 12),
+        Card(Name.QUEEN, Suit.DIAMONDS, 13),
+    ]
+    g.players[0].hand[0].set_value("SIX")
+
+    assert g.play_down(
+        g.players[0],
+        [
+            [
+                g.players[0].hand[0],
+                Card(Name.THREE, Suit.CLUBS, 2),
+                Card(Name.FOUR, Suit.CLUBS, 3),
+                Card(Name.FIVE, Suit.CLUBS, 4),
+            ],
+            [
+                Card(Name.FOUR, Suit.HEARTS, 5),
+                Card(Name.FIVE, Suit.HEARTS, 6),
+                Card(Name.SIX, Suit.HEARTS, 7),
+                Card(Name.SEVEN, Suit.HEARTS, 8),
+                Card(Name.EIGHT, Suit.HEARTS, 9),
+            ],
+            [
+                Card(Name.NINE, Suit.DIAMONDS, 10),
+                Card(Name.TEN, Suit.DIAMONDS, 11),
+                Card(Name.JACK, Suit.DIAMONDS, 12),
+                Card(Name.QUEEN, Suit.DIAMONDS, 13),
+            ],
+        ],
+    )

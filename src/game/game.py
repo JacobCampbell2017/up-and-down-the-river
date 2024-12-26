@@ -73,19 +73,21 @@ class Game:
         return winner
 
     def play_down(self, player: Player, played_hand: list[list]) -> bool:
-        temp = []
-        if self.is_valid_play_down(played_hand):
-            player.play_hand(played_hand)
-            for hand in played_hand:
-                player.remove_cards(hand)
-                temp.append(hand)
-            if player.has_leftover_card() and self.round != 7:
-                return True
-            if not player.has_leftover_card() and self.round == 7:
-                return True
-            for ls in temp:
-                for card in ls:
-                    player.add_card(card)
+        if not self.is_valid_play_down(played_hand):
+            return False
+
+        original_hand = player.hand.copy()
+
+        player.play_hand(played_hand)
+        for hand in played_hand:
+            player.remove_cards(hand)
+
+        if (self.round != 7 and player.has_leftover_card()) or (
+            self.round == 7 and not player.has_leftover_card()
+        ):
+            return True
+
+        player.hand = original_hand
         return False
 
     def is_valid_play_down(self, played_hand: list[list]) -> bool:
@@ -95,73 +97,33 @@ class Game:
             played_hand (list[list]): The list of hands played. Divided into players choice of cards.
 
         Returns:
-            bool: True if every round requirement is met or false if incorrect hands for the current round.
+            bool: True if every round requirement is met or False if incorrect hands for the current round.
         """
 
-        # Match for rounds
-        copy_hand = played_hand.copy()
-        match (self.round):
-            case 1:
-                return (
-                    len(played_hand) == 2
-                    and self.is_valid_set(copy_hand[0])
-                    and self.is_valid_set(copy_hand[1])
-                )
+        # Round requirements
+        round_requirements = {
+            1: [self.is_valid_set, self.is_valid_set],
+            2: [self.is_valid_set, self.is_valid_run],
+            3: [self.is_valid_run, self.is_valid_run],
+            4: [self.is_valid_set, self.is_valid_set, self.is_valid_set],
+            5: [self.is_valid_set, self.is_valid_set, self.is_valid_run],
+            6: [self.is_valid_set, self.is_valid_run, self.is_valid_run],
+            7: [self.is_valid_run, self.is_valid_run, self.is_valid_run],
+        }
 
-            case 2:
-                # The issue is do I want to allow the player to select their group of cards in any order?
-                # i.e (if round 2, player selects set first, then run. OR The player can choose the run first or set.)
-                # Limiting the choice of what the player wants to select makes this part easier. Always setting sets firsts
-                # makes testing easier
+        if self.round not in round_requirements:
+            raise ValueError(f"Invalid round number: {self.round}")
 
-                # Make sets chosen first, later on in development perhaps comeback to allow for either order
-                return (
-                    len(played_hand) == 2
-                    and self.is_valid_set(copy_hand[0])
-                    and self.is_valid_run(copy_hand[1])
-                )
+        requirements = round_requirements[self.round]
 
-            case 3:
-                return (
-                    len(played_hand) == 2
-                    and self.is_valid_run(copy_hand[0])
-                    and self.is_valid_run(copy_hand[1])
-                )
+        if len(played_hand) != len(requirements):
+            return False
 
-            case 4:
-                return (
-                    len(played_hand) == 3
-                    and self.is_valid_set(copy_hand[0])
-                    and self.is_valid_set(copy_hand[1])
-                    and self.is_valid_set(copy_hand[2])
-                )
+        for hand, validate in zip(played_hand, requirements):
+            if not validate(hand):
+                return False
 
-            case 5:
-                return (
-                    len(played_hand) == 3
-                    and self.is_valid_set(copy_hand[0])
-                    and self.is_valid_set(copy_hand[1])
-                    and self.is_valid_run(copy_hand[2])
-                )
-
-            case 6:
-                return (
-                    len(played_hand) == 3
-                    and self.is_valid_set(copy_hand[0])
-                    and self.is_valid_run(copy_hand[1])
-                    and self.is_valid_run(copy_hand[2])
-                )
-
-            case 7:
-                return (
-                    len(played_hand) == 3
-                    and self.is_valid_run(copy_hand[0])
-                    and self.is_valid_run(copy_hand[1])
-                    and self.is_valid_run(copy_hand[2])
-                )
-
-            case _:
-                raise ValueError
+        return True
 
     def is_valid_run(self, played_hand: list) -> bool:
         """Determines if the selected cards are a valid run.
@@ -180,7 +142,6 @@ class Game:
             return False
 
         played_hand.sort()
-        print(played_hand)
 
         # if all cards are wild cards
         # if multiple suits are played in same hand
