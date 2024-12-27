@@ -41,6 +41,7 @@ class Card:
         self.suit = suit
         self.value = self._assign_value()
         self.id = id
+        self.number = name.value
 
     def is_wild(self) -> bool:
         return self.suit == Suit.WILD or self.name == Name.TWO
@@ -66,19 +67,19 @@ class Card:
         if self.name.name == "JOKER":
             return "JOKER"
         else:
-            return f"ID: {self.id} {self.name.name} of {self.suit.name}"
+            return f"{self.name.name} of {self.suit.name}"
 
     def __lt__(self, other):
         """Defines how cards are compared for sorting"""
         if not isinstance(other, Card):
             return NotImplemented
-        return self.name.value < other.name.value
+        return self.number < other.number
 
     def __gt__(self, other):
         """Defines how cards are compared for sorting"""
         if not isinstance(other, Card):
             return NotImplemented
-        return self.name.value >= other.name.value
+        return self.number >= other.number
 
 
 class Wild(Card):
@@ -86,6 +87,10 @@ class Wild(Card):
         super().__init__(name, suit, id)
         self.chosen_name = Name.INVALID
         self.chosen_suit = Suit.WILD
+        self.number = 20
+
+    def is_not_set(self) -> bool:
+        return self.chosen_name == Name.INVALID
 
     def set_value(self, chosen: str) -> Name:
         """Changes the wildcard's temporary value to a valid card name.
@@ -105,6 +110,7 @@ class Wild(Card):
         for name in Name:
             if chosen == name.name:
                 self.chosen_name = Name(name)
+                self.number = self.chosen_name.value
                 return self.chosen_name
         raise InvalidChangeError
 
@@ -132,33 +138,17 @@ class Wild(Card):
         return super().__repr__() + f" - Temp value -> {chosen_value}"
 
     def __str__(self):
-        return (
-            super().__str__()
-            + " - Temp value ->  "
-            + self.chosen_name.name
-            + " of "
-            + self.chosen_suit.name
-        )
+        return self.chosen_name.name + " of " + self.chosen_suit.name + " [WILD]"
 
     def __lt__(self, other):
         """Defines the way wildcards are compared to others"""
         if not isinstance(other, Card):
             return NotImplemented
-        if isinstance(other, Wild) and other.chosen_name != Name.INVALID:
-            if isinstance(self, Wild) and self.chosen_name != Name.INVALID:
-                return self.chosen_name.value < other.chosen_name.value
-        if isinstance(other, Card) and self.chosen_name == Name.INVALID:
-            return self.value < other.name.value
 
-        return self.chosen_name.value < other.name.value
+        return self.number < other.number
 
     def __gt__(self, other):
         """Defines the way wildcards are compared to others"""
         if not isinstance(other, Card):
             return NotImplemented
-        if isinstance(other, Wild) and other.chosen_name != Name.INVALID:
-            if isinstance(self, Wild) and self.chosen_name != Name.INVALID:
-                return self.chosen_name.value > other.chosen_name.value
-        if isinstance(other, Card) and self.chosen_name == Name.INVALID:
-            return self.value > other.name.value
-        return self.chosen_name.value > other.name.value
+        return self.number > other.number

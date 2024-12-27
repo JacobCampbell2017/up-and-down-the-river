@@ -52,7 +52,7 @@ class Game:
             pass
 
         for card in pile:
-            if card.is_wild() and card_to_add.name.value == card.chosen_name.value:
+            if card.is_wild() and card_to_add.number == card.number:
                 pile[pile.index(card)] = card_to_add
                 if pile[-1].name.value == 14:
                     card_name = [
@@ -263,22 +263,9 @@ class Game:
 
         # if same suits but cards not in sequence
         for card in played_hand[1:3]:
-            if (type(base_card) == Wild and type(card) == Wild) and (
-                played_hand[card.chosen_name.value - base_card.chosen_name.value]
-                != card
-            ):
+            if card.is_wild() and card.is_not_set():
                 return False
-            if (type(base_card) == Wild and type(card) != Wild) and (
-                played_hand[card.name.value - base_card.chosen_name.value] != card
-            ):
-                return False
-            if (type(base_card) != Wild and type(card) == Wild) and (
-                played_hand[card.chosen_name.value - base_card.name.value] != card
-            ):
-                return False
-            if (type(base_card) != Wild and type(card) != Wild) and (
-                played_hand[card.name.value - base_card.name.value] != card
-            ):
+            if played_hand[card.number - base_card.number] != card:
                 return False
 
         return True
@@ -368,3 +355,18 @@ class Game:
 
     def __repr__(self):
         return f"{self.players} {self.deck} {self.winner}"
+
+
+g = Game()
+
+pile = [
+    Card(Name.THREE, Suit.HEARTS, 1),
+    Card(Name.FOUR, Suit.HEARTS, 2),
+    Card(Name.FIVE, Suit.HEARTS, 3),
+    Card(Name.SIX, Suit.HEARTS, 4),
+]
+
+card_to_add = Card(Name.SEVEN, Suit.HEARTS, 5)
+
+g.add_to_run(pile, card_to_add)
+print(pile)
