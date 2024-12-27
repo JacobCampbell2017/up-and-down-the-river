@@ -40,6 +40,48 @@ class Game:
         while len(self.winner) == 0:
             pass
 
+    def add_to_run(self, pile: list[Card], card_to_add: Card) -> bool:
+        """Test to see if card can be added to run. If it can take the place of a wild, replace the wild and send wild to the
+        end of the pile by default until set wild position is added"""
+        suit = [card.suit for card in pile if not card.is_wild()]
+        if card_to_add.suit != suit[0] and not card_to_add.is_wild():
+            return False
+
+        if card_to_add.is_wild():
+            # set wild temp value here with func!
+            pass
+
+        for card in pile:
+            if card.is_wild() and card_to_add.name.value == card.chosen_name.value:
+                pile[pile.index(card)] = card_to_add
+                if pile[-1].name.value == 14:
+                    card_name = [
+                        name.name
+                        for name in Name
+                        if name.value == (pile[0].name.value - 1)
+                    ]
+                    card.set_value(card_name[0])
+                    pile.insert(0, card)
+                    return True
+                card_name = [
+                    name.name
+                    for name in Name
+                    if name.value == (pile[-1].name.value + 1)
+                ]
+                card.set_value(card_name[0])
+                pile.append(card)
+                return True
+
+        if pile[-1].name.value == (card_to_add.name.value - 1):
+            pile.append(card_to_add)
+            return True
+
+        if pile[0].name.value == (card_to_add.name.value + 1):
+            pile.insert(0, card_to_add)
+            return True
+
+        return False
+
     def draw_card(self) -> Card:
         """Draws a card from the deck or refills it if empty."""
         if len(self.deck) == 0:
