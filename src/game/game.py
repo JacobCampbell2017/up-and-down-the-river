@@ -112,6 +112,27 @@ class Game:
     # Validation Functions #
     ########################
 
+    def is_set(self, pile: list[Card]) -> bool:
+        """Determines if played down pile is set, can be used inverse to determine if run
+
+        Returns:
+            bool: True if set, False if run
+        """
+        wilds: Wild = []
+        non_wilds = []
+        for card in pile:
+            if card.is_wild():
+                wilds.append(card)
+            else:
+                non_wilds.append(card)
+
+        name = non_wilds[0].name
+        if all(card.name == non_wilds[0].name for card in non_wilds) and all(
+            card.chosen_name == Name.INVALID for card in wilds
+        ):
+            return True
+        return False
+
     def is_valid_play_down(self, played_hand: list[list]) -> bool:
         """Determines if the played hands are valid according to the current round.
 
@@ -288,37 +309,3 @@ class Game:
 
     def __repr__(self):
         return f"{self.players} {self.deck} {self.winner}"
-
-
-g = Game()
-g.round = 1
-g.display_players()
-g.players[0].hand = [
-    Card(Name.FOUR, Suit.DIAMONDS, 1),
-    Card(Name.FOUR, Suit.DIAMONDS, 2),
-    Card(Name.FOUR, Suit.CLUBS, 3),
-    Card(Name.FIVE, Suit.DIAMONDS, 4),
-    Card(Name.FIVE, Suit.DIAMONDS, 5),
-    Card(Name.FIVE, Suit.CLUBS, 6),
-    Card(Name.FOUR, Suit.DIAMONDS, 7),
-    Card(Name.FOUR, Suit.DIAMONDS, 8),
-    Card(Name.FOUR, Suit.CLUBS, 9),
-]
-
-g.display_players()
-g.play_down(
-    g.players[0],
-    [
-        [
-            Card(Name.FOUR, Suit.DIAMONDS, 1),
-            Card(Name.FOUR, Suit.DIAMONDS, 2),
-            Card(Name.FOUR, Suit.CLUBS, 3),
-        ],
-        [
-            Card(Name.FIVE, Suit.DIAMONDS, 4),
-            Card(Name.FIVE, Suit.DIAMONDS, 5),
-            Card(Name.FIVE, Suit.CLUBS, 6),
-        ],
-    ],
-)
-g.display_players()
