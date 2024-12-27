@@ -92,9 +92,27 @@ class Game:
         player.hand = original_hand
         return False
 
-    def play_to_piles(player: Player, played_card: Card, target_pile: list) -> bool:
+    def play_to_pile(
+        self,
+        player: Player,
+        played_card: Card,
+        target_player: Player,
+        target_pile: list[Card],
+    ) -> bool:
+        """Plays card to a played down pile"""
         if not player.has_played():
             return False
+
+        if self.is_set(target_pile):
+            if played_card.name == target_pile[0].name or played_card.is_wild():
+                target_pile.append(played_card)
+                player.remove_cards([played_card])
+                return True
+            return False
+
+        # Think of replacing wilds or adding wild
+        if not self.is_set(target_pile):
+            pass
 
         return False
 
@@ -183,7 +201,6 @@ class Game:
             self.round != 7 and len(played_hand) != 4
         ):
             return False
-
         played_hand.sort()
 
         # if all cards are wild cards
