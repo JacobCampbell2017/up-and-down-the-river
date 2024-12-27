@@ -26,7 +26,7 @@ class Game:
         self.players = [Player("A"), Player("B"), Player("C")]
         self.deck = self._generate_deck()
         self.discard = []
-        self.winner = False
+        self.winner = []
         self.currentPlayer = self.players[0]
         self.round = 0
         pass
@@ -35,7 +35,9 @@ class Game:
 
     def game_loop(self):
         """Main loop that will run the game until final round is played"""
-        while self.winner == False:
+        self.shuffle_deck()
+        self.deal_cards()
+        while len(self.winner) == 0:
             pass
 
     def draw_card(self) -> Card:
@@ -54,11 +56,11 @@ class Game:
         """Adds a specified Cards to every players hand. The deck continues to be shuffled until the top card that is
         added to the discard pile is not a wild card.
         """
-        for _ in range(11):
+        for _ in range(num_of_cards):
             for player in self.players:
                 player.add_card(self.draw_card())
         self.discard = self.deck[-1:]
-        while self.is_wild(self.discard[0]):
+        while self.discard[0].is_wild():
             self.shuffle_deck()
             self.discard = self.deck[-1:]
         return None
@@ -89,6 +91,26 @@ class Game:
 
         player.hand = original_hand
         return False
+
+    def play_to_piles(player: Player, played_card: Card, target_pile: list) -> bool:
+        if not player.has_played():
+            return False
+
+        return False
+
+    def shuffle_deck(self) -> None:
+        """Shuffles self.deck and updates in place.
+
+        It modifies the deck directly and can be called without storing the result.
+
+        Returns:
+            list: the shuffled deck
+        """
+        return random.shuffle(self.deck)
+
+    ########################
+    # Validation Functions #
+    ########################
 
     def is_valid_play_down(self, played_hand: list[list]) -> bool:
         """Determines if the played hands are valid according to the current round.
@@ -148,7 +170,7 @@ class Game:
         # Take suit of first non wild
         suit = Suit.WILD
         for card in played_hand:
-            if not self.is_wild(card):
+            if not card.is_wild():
                 suit = card.suit
         if suit == Suit.WILD:
             return False
@@ -156,7 +178,7 @@ class Game:
         base_card = played_hand[0]
 
         for card in played_hand[1:3]:
-            if card.suit != suit and not self.is_wild(card):
+            if card.suit != suit and not card.is_wild():
                 return False
 
         # if same suits but cards not in sequence
@@ -196,37 +218,21 @@ class Game:
         # Sort played hands based on the value
         played_hand.sort()
 
-        if self.is_wild(played_hand[0]):
+        if played_hand[0].is_wild():
             return False
 
         if (
-            played_hand[0].name != played_hand[1].name
-            and not self.is_wild(played_hand[1])
+            played_hand[0].name != played_hand[1].name and not played_hand[1].is_wild()
         ) or (
-            played_hand[0].name != played_hand[2].name
-            and not self.is_wild(played_hand[2])
+            played_hand[0].name != played_hand[2].name and not played_hand[2].is_wild()
         ):
             return False
 
         return True
 
-    def is_wild(self, card: Card) -> bool:
-        return card.suit == Suit.WILD or card.value == 20
-
-    def play_hands(self, player: Player, played_hand: list[list]) -> bool:
-        pass
-
-    def shuffle_deck(self) -> None:
-        """Shuffles self.deck and updates in place.
-
-        It modifies the deck directly and can be called without storing the result.
-
-        Returns:
-            list: the shuffled deck
-        """
-        return random.shuffle(self.deck)
-
+    #####################
     # Display Functions #
+    #####################
 
     def display_deck(self) -> None:
         """displays cards left in the deck"""
@@ -276,7 +282,9 @@ class Game:
             players.append(Player())
         return players
 
+    #################
     # Magic Methods #
+    #################
 
     def __repr__(self):
         return f"{self.players} {self.deck} {self.winner}"

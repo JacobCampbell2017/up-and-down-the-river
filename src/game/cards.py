@@ -42,6 +42,9 @@ class Card:
         self.value = self._assign_value()
         self.id = id
 
+    def is_wild(self) -> bool:
+        return self.suit == Suit.WILD or self.name == Name.TWO
+
     def _assign_value(self) -> int:
         """Assigns point value to card based on the values given to constructor."""
         if self.name.value >= 3 and self.name.value <= 9:
