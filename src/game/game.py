@@ -9,8 +9,6 @@ Future Considerations for game rules:
  - Minimum/Maximum players changing the cards dealt and deck count
 
 
-12/23/2024
-FINISH LOGIC FOR VALID HANDS BASED ON ROUND
 """
 
 from enum import Enum
@@ -27,7 +25,7 @@ class Game:
         self.deck = self._generate_deck()
         self.discard = []
         self.winner = []
-        self.currentPlayer = self.players[0]
+        self.current_player = 0
         self.round = 0
         pass
 
@@ -46,10 +44,6 @@ class Game:
         suit = [card.suit for card in pile if not card.is_wild()]
         if card_to_add.suit != suit[0] and not card_to_add.is_wild():
             return False
-
-        if card_to_add.is_wild():
-            # set wild temp value here with func!
-            pass
 
         for card in pile:
             if card.is_wild() and card_to_add.number == card.number:
@@ -307,15 +301,36 @@ class Game:
             print(str(card))
         return None
 
+    def display_discard(self) -> None:
+        """Displays the current card in the discard pile"""
+        print(str(self.discard))
+        return None
+
     def display_players(self) -> None:
         """Displays players"""
         for player in self.players:
             print(player)
         return None
 
-    def display_discard(self) -> None:
-        """Displays the current card in the discard pile"""
-        print(str(self.discard))
+    def display_turn(self) -> None:
+        """Displays number of cards each player has, top discarded card, and the current players hand"""
+        print(f"{'='*30}")
+        players = [
+            player
+            for player in self.players
+            if player is not self.players[self.current_player]
+        ]
+
+        for player in players:
+            print(f"{player.name}: {len(player.hand)}", end=" ")
+        print()
+        print(f"Discard: {self.discard[-1]}")
+        print(f"Hand: {self.players[self.current_player].hand}")
+        print("Card #  ", end="")
+        for i in range(11):
+            print(f"{i:<5}", end=" ")
+        print()
+
         return None
 
     # Game Setup #
@@ -359,14 +374,6 @@ class Game:
 
 g = Game()
 
-pile = [
-    Card(Name.THREE, Suit.HEARTS, 1),
-    Card(Name.FOUR, Suit.HEARTS, 2),
-    Card(Name.FIVE, Suit.HEARTS, 3),
-    Card(Name.SIX, Suit.HEARTS, 4),
-]
-
-card_to_add = Card(Name.SEVEN, Suit.HEARTS, 5)
-
-g.add_to_run(pile, card_to_add)
-print(pile)
+g.shuffle_deck()
+g.deal_cards()
+g.display_turn()

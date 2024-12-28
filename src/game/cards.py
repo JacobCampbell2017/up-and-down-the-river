@@ -9,6 +9,14 @@ from enum import Enum
 from game_errors import InvalidChangeError
 
 
+class Suit_Emoji(Enum):
+    HEARTS = "\N{black heart suit}"
+    DIAMONDS = "\N{black diamond suit}"
+    SPADES = "\N{black spade suit}"
+    CLUBS = "\N{black club suit}"
+    WILD = "\N{playing card black joker}"
+
+
 class Suit(Enum):
     HEARTS = 0
     DIAMONDS = 1
@@ -35,6 +43,24 @@ class Name(Enum):
     ACE = 14
 
 
+class Name_Print(Enum):
+    INVALID = "Uh Oh"
+    JOKER = "JOKER"
+    TWO = "2"
+    THREE = "3"
+    FOUR = "4"
+    FIVE = "5"
+    SIX = "6"
+    SEVEN = "7"
+    EIGHT = "8"
+    NINE = "9"
+    TEN = "10"
+    JACK = "J"
+    QUEEN = "Q"
+    KING = "K"
+    ACE = "A"
+
+
 class Card:
     def __init__(self, name: Name, suit: Suit, id: int = -1):
         self.name = name
@@ -59,13 +85,13 @@ class Card:
 
     def __repr__(self):
         if self.name.name == "JOKER":
-            return f"ID: {self.id} JOKER"
+            return f"|{Suit_Emoji.WILD.value}|"
         else:
-            return f"ID {self.id}: {self.name.name} of {self.suit.name}"
+            return f"|{Name_Print[self.name.name].value}{Suit_Emoji[self.suit.name].value}|"
 
     def __str__(self):
         if self.name.name == "JOKER":
-            return "JOKER"
+            return f"{Suit_Emoji.WILD.value}"
         else:
             return f"{self.name.name} of {self.suit.name}"
 
@@ -135,7 +161,7 @@ class Wild(Card):
             if self.chosen_name != Name.INVALID
             else "Not Set"
         )
-        return super().__repr__() + f" - Temp value -> {chosen_value}"
+        return super().__repr__()
 
     def __str__(self):
         return self.chosen_name.name + " of " + self.chosen_suit.name + " [WILD]"

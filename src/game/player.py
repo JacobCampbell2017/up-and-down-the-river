@@ -36,7 +36,7 @@ class Player:
         hand_str = ", ".join(str(card) for card in self.hand[:5]) + (
             "..." if len(self.hand) > 5 else ""
         )
-        return f"Player {self.name} | Score: {self.score} | Hand: [{hand_str}] | Piles: [{self.played_hands}]"
+        return f"Player {self.name} | Score: {self.score} | Hand: [{hand_str}] | Piles: {self.played_hands}"
 
     def __str__(self):
         hand_str = ", ".join(str(card) for card in self.hand[:5]) + (
