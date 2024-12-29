@@ -76,6 +76,10 @@ class Game:
 
         return False
 
+    def buy_card(self, player: Player) -> Card:
+        player.add_card(self.discard.pop())
+        player.add_card(self.draw_card())
+
     def draw_card(self) -> Card:
         """Draws a card from the deck or refills it if empty."""
         if len(self.deck) == 0:
@@ -88,6 +92,22 @@ class Game:
             self.shuffle_deck()
         return self.deck.pop()
 
+    def let_buy(self) -> bool:
+        players = [
+            player
+            for player in self.players
+            if player is not self.players[self.current_player]
+        ]
+        for player in players:
+            ans = input(
+                f"{player.name} would you like to buy the {self.discard[-1]}? (Y/N): "
+            )
+            if ans.upper() == "Y":
+                self.buy_card(player)
+                return True
+
+        return False
+
     def deal_cards(self, num_of_cards=11) -> None:
         """Adds a specified Cards to every players hand. The deck continues to be shuffled until the top card that is
         added to the discard pile is not a wild card.
@@ -95,10 +115,9 @@ class Game:
         for _ in range(num_of_cards):
             for player in self.players:
                 player.add_card(self.draw_card())
-        self.discard = self.deck[-1:]
-        while self.discard[0].is_wild():
+        while self.deck[-1].is_wild():
             self.shuffle_deck()
-            self.discard = self.deck[-1:]
+        self.discard.append(self.deck.pop())
         return None
 
     def determine_winner(self) -> list:
@@ -291,6 +310,12 @@ class Game:
 
         return True
 
+    def turn_loop(self) -> None:
+        self.display_turn()
+        self.draw_or_buy()
+
+        return None
+
     #####################
     # Display Functions #
     #####################
@@ -313,8 +338,12 @@ class Game:
         return None
 
     def display_turn(self) -> None:
-        """Displays number of cards each player has, top discarded card, and the current players hand"""
+        """Displays number of cards each player has, top discarded card, and the current players hand
+
+        Used for Text version of game"""
         print(f"{'='*30}")
+        print(f"{self.players[self.current_player].name}'s Turn - Round {self.round}")
+        print()
         players = [
             player
             for player in self.players
@@ -322,12 +351,15 @@ class Game:
         ]
 
         for player in players:
-            print(f"{player.name}: {len(player.hand)}", end=" ")
+            print(f"Player {player.name}: {len(player.hand)} cards", end=" ")
         print()
-        print(f"Discard: {self.discard[-1]}")
+        if len(self.discard) < 1:
+            print("Discard: []")
+        else:
+            print(f"Discard: {self.discard[-1]}")
         print(f"Hand: {self.players[self.current_player].hand}")
         print("Card #  ", end="")
-        for i in range(11):
+        for i in range(len(self.players[self.current_player].hand)):
             print(f"{i:<5}", end=" ")
         print()
 
@@ -376,4 +408,3 @@ g = Game()
 
 g.shuffle_deck()
 g.deal_cards()
-g.display_turn()

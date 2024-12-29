@@ -93,7 +93,7 @@ class Card:
         if self.name.name == "JOKER":
             return f"{Suit_Emoji.WILD.value}"
         else:
-            return f"{self.name.name} of {self.suit.name}"
+            return f"|{Name_Print[self.name.name].value}{Suit_Emoji[self.suit.name].value}|"
 
     def __lt__(self, other):
         """Defines how cards are compared for sorting"""
